@@ -2,26 +2,23 @@ import torch
 from torch import nn as nn
 from torch_geometric.data import Data
 
-from Modules.GNN.GNN_Layer_External import GNN_Layer_External
-from Modules.GNN.GNN_Layer_Internal_Arbitrary import GNN_Layer_Internal_Arbitrary
-from Modules.GNN.Activations import Swish, Sigmoid, Tanh
+from Source.Modules.GNN.GNN_Layer_External import GNN_Layer_External
+from Source.Modules.GNN.GNN_Layer_Internal import GNN_Layer_Internal
+from Source.Modules.Activations import Tanh
 
 
-class MPNNArbitraryLocation(nn.Module):
+class MPNN(nn.Module):
     def __init__(self,
                  n_passing,
-                 n_stations,
                  lead_hrs,
-                 n_variables_m,
                  n_node_features_m,
                  n_node_features_e,
                  n_out_features,
                  hidden_dim=128):
 
-        super(MPNNArbitraryLocation, self).__init__()
+        super(MPNN, self).__init__()
 
         self.lead_hrs = lead_hrs
-        self.n_variables_m = n_variables_m
         self.n_node_features_m = n_node_features_m
         self.n_node_features_e = n_node_features_e
         self.n_passing = n_passing
@@ -33,7 +30,7 @@ class MPNNArbitraryLocation(nn.Module):
 
 
         self.gnn_layers = nn.ModuleList(modules=(
-            GNN_Layer_Internal_Arbitrary(
+            GNN_Layer_Internal(
             in_dim=self.hidden_dim,
             hidden_dim=self.hidden_dim,
             out_dim=self.hidden_dim,

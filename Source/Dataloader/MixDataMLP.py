@@ -4,14 +4,13 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from Dataloader.MixDataArbitrary import MixDataArbitrary
+from Source.Dataloader.MixData import MixData
 
 
-class MixDataArbitraryMLP(MixDataArbitrary):
-    def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, static_node, n_neighbors_m2m,
-                 era5_network, dataset, edge_type='DEM', root_path=Path('/home/mila/q/qidong.yang/scratch')):
-        MixDataArbitrary.__init__(self, year, back_hrs, lead_hours, meta_station, madis_network, static_node, n_neighbors_m2m,
-                 era5_network, dataset, edge_type=edge_type, root_path=root_path)
+class MixDataMLP(MixData):
+    def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m,
+                 era5_network, root_path=Path('')):
+        MixData.__init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network, root_path)
 
         if self.era5_network is not None:
 

@@ -1,9 +1,6 @@
 import numpy as np
 import torch
 
-from Network import Helpers
-
-
 class ERA5Network:
     def __init__(self, ERA5_data, MadisNetwork, n_neighbors_e2m):
         self.n_neighbors_e2m = n_neighbors_e2m
@@ -14,9 +11,25 @@ class ERA5Network:
         self.era5_lons = self.era5_pos[:, 0]
         self.era5_lats = self.era5_pos[:, 1]
 
-        self.e2m_edge_index = Helpers.search_k_neighbors(self.MadisNetwork.pos, self.era5_pos, self.n_neighbors_e2m).long()
+        self.e2m_edge_index = self.search_k_neighbors(self.MadisNetwork.pos, self.era5_pos, self.n_neighbors_e2m).long()
         self.e2m_relativeDistance = self.BuildIntepolationWeight(self.e2m_edge_index, self.era5_lons, self.era5_lats, self.MadisNetwork.stat_lons, self.MadisNetwork.stat_lats)
 
+
+    def search_k_neighbors(self, base_points, cand_points, k):
+        # base_points: (n_b, n_features)
+        # cand_points: (n_c, n_features)
+
+        dis = torch.sum((base_points.unsqueeze(1) - cand_points.unsqueeze(0)) ** 2, dim=-1)
+        _, inds = torch.topk(dis, k, dim=1, largest=False)
+
+        n_b = base_points.size(0)
+
+        j_inds = inds.view((1, -1))
+        i_inds = (torch.arange(n_b).view((-1, 1)) * torch.ones((n_b, k))).view((1, -1))
+
+        edge_index = torch.cat([j_inds, i_inds], dim=0)
+
+        return edge_index
 
     def BuildIntepolationWeight(self, edges, lon_e, lat_e, lon_m, lat_m):
 

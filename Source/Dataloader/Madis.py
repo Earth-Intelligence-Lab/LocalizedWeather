@@ -10,7 +10,7 @@ from shapely import points
 
 class Madis(object):
     def __init__(self, times, coords_raw, coords, lat_low, lat_up, lon_low, lon_up, file_name, filtered_file_name, n_years=5,
-                 root_path=Path('/home/mila/q/qidong.yang/scratch')):
+                 root_path=Path('')):
 
         # n_years comes from meta station
 
@@ -53,13 +53,6 @@ class Madis(object):
         else:
             rawdata = self.createRawFile()
             self.ds_xr = self.createFile(rawdata)
-
-
-        # self.min = ...
-        # self.max = ...
-        # self.mean = ...
-        # self.std = ...
-        # self.n = ...
 
     def createRawFile(self):
         if (os.path.exists(self.madis_raw_ds_path)):

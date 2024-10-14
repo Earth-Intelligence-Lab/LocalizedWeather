@@ -6,7 +6,7 @@ import xarray as xr
 
 class ERA5(object):
     def __init__(self, lat_low, lat_up, lon_low, lon_up, year, region='Northeastern',
-                 root_path=Path('/home/mila/q/qidong.yang/scratch')):
+                 root_path=Path('')):
 
         buffer = 1.5
 

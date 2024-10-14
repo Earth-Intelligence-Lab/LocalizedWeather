@@ -3,16 +3,9 @@
 # Date: 2024-02-14
 
 
-import torch
-import numpy as np
-import torch.nn as nn
-import torch.nn.functional as F
-import matplotlib.pyplot as plt
-
-
-class MaxMinNormalizer(object):
+class MinMaxNormalizer(object):
     def __init__(self, min, max, eps=0.00001):
-        super(MaxMinNormalizer, self).__init__()
+        super(MinMaxNormalizer, self).__init__()
 
         # normalization using overall maximum and minmum so falling into [0, 1]
 
@@ -31,6 +24,7 @@ class MaxMinNormalizer(object):
         x = x * (self.max - self.min + self.eps) + self.min
 
         return x
+
 
 class ABNormalizer(object):
     def __init__(self, min_x, max_x, a, b, eps=0.00001):

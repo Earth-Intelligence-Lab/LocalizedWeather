@@ -6,16 +6,13 @@ import pandas as pd
 import torch
 from dateutil import rrule
 from torch.utils.data import Dataset
-from torch_geometric.nn import knn_graph
-from torch_geometric.utils import subgraph
 
-from Dataloader.ERA5 import ERA5
-from Dataloader.Madis import Madis
-from Network.ERA5Network import ERA5Network
-from utilities import MaxMinNormalizer
+from Source.Dataloader.ERA5 import ERA5
+from Source.Dataloader.Madis import Madis
+from Source.Helpers.Normalisers import MinMaxNormalizer
 
 
-class MixDataArbitrary(Dataset):
+class MixData(Dataset):
     def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network, root_path=Path('')):
         # meta_station: MetaStation object
 
@@ -66,11 +63,11 @@ class MixDataArbitrary(Dataset):
             self.era5_temp_max = self.ERA5.t_max
 
         if self.era5_network is not None:
-            self.lat_normalizer = MaxMinNormalizer(self.ERA5.lat_low, self.ERA5.lat_up)
-            self.lon_normalizer = MaxMinNormalizer(self.ERA5.lon_low, self.ERA5.lon_up)
+            self.lat_normalizer = MinMaxNormalizer(self.ERA5.lat_low, self.ERA5.lat_up)
+            self.lon_normalizer = MinMaxNormalizer(self.ERA5.lon_low, self.ERA5.lon_up)
         else:
-            self.lat_normalizer = MaxMinNormalizer(self.Madis.lat_low, self.Madis.lat_up)
-            self.lon_normalizer = MaxMinNormalizer(self.Madis.lon_low, self.Madis.lon_up)
+            self.lat_normalizer = MinMaxNormalizer(self.Madis.lat_low, self.Madis.lat_up)
+            self.lon_normalizer = MinMaxNormalizer(self.Madis.lon_low, self.Madis.lon_up)
 
     def __len__(self):
 

@@ -2,10 +2,10 @@ import torch
 from torch import nn
 from torch_geometric.nn import MessagePassing, InstanceNorm
 
-from Modules.GNN.Activations import Swish, Tanh
+from Source.Modules.Activations import Tanh
 
 
-class GNN_Layer_Internal_Arbitrary(MessagePassing):
+class GNN_Layer_Internal(MessagePassing):
     """
     Internal message passing layer
     """
@@ -13,7 +13,7 @@ class GNN_Layer_Internal_Arbitrary(MessagePassing):
         """
         Initialize message passing layers
         """
-        super(GNN_Layer_Internal_Arbitrary, self).__init__(node_dim=-2, aggr='mean')
+        super(GNN_Layer_Internal, self).__init__(node_dim=-2, aggr='mean')
 
         self.in_dim = in_dim
         self.out_dim = out_dim

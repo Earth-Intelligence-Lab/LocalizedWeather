@@ -3,8 +3,6 @@ from collections import Counter
 from pathlib import Path
 
 import geopandas as gpd
-import numpy
-import numpy as np
 import pandas as pd
 import xarray as xr
 from shapely import points
@@ -12,9 +10,7 @@ from shapely import points
 
 class MetaStation(object):
     def __init__(self, lat_low, lat_up, lon_low, lon_up, n_years=5, control_ratio=0.9, shapefile_path=None,
-                 root_path=Path('/home/mila/q/qidong.yang/scratch')):
-        # lon: 0 -- 360
-        # lat: -90 -- 90
+                 root_path=Path('')):
 
         self.lat_low = lat_low
         self.lat_up = lat_up
@@ -80,7 +76,6 @@ class MetaStation(object):
                     coords_sub = data[['longitude', 'latitude','year','month','day','hour']].to_pandas().reset_index(drop=True).drop_duplicates()[['longitude','latitude']].values
                     counter = counter + Counter(points(coords_sub))
 
-        #max_obs = np.max(np.array(max_list))
 
         counter = gpd.GeoDataFrame(pd.Series(counter).reset_index().rename(columns={'index': 'geometry', 0: 'num'}))
 
@@ -90,8 +85,6 @@ class MetaStation(object):
             roi = gpd.read_file(self.shapefile_path).dissolve()
             counter = counter[counter.geometry.within(roi.iloc[0].geometry)]
 
-        #counter['max'] = max_obs
-        #counter['min'] = 0
         counter.to_file(self.all_station_file, index=False)
 
         return counter

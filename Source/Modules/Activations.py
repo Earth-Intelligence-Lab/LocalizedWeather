@@ -12,6 +12,7 @@ class Sigmoid(nn.Module):
     def forward(self, x):
         return torch.sigmoid(x)
 
+
 class Tanh(nn.Module):
     """
     Tanh activation function

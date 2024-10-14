@@ -2,12 +2,9 @@ import numpy as np
 import torch
 from torch_geometric.nn import knn_graph
 
-from Network import Helpers
-from Settings.Settings import StationSamplingMethod
-
 
 class MadisNetwork:
-    def __init__(self, meta_station, station_sampling_method, p_arbitrary_nodes, p_arbitrary_nodes_valid, p_arbitrary_nodes_test, n_neighbors_m2m, network_construction_method):
+    def __init__(self, meta_station, n_neighbors_m2m):
         # meta_station: MetaStation object
 
         self.n_neighbors_m2m = n_neighbors_m2m

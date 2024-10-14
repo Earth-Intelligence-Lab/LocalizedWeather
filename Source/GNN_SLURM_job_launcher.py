@@ -110,7 +110,7 @@ class SlurmJob(object):
 
 def point_model():
 
-    python_file = '/shared/home/jgiezend/wind_obs_correction/gnn_main_arbitrary.py'
+    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'MLP'
 
     station_sampling_method = StationSamplingMethod.none.value
@@ -142,7 +142,7 @@ def point_model():
 
 def point_model_w_static_node():
 
-    python_file = '/shared/home/jgiezend/wind_obs_correction/gnn_main_arbitrary.py'
+    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'MLP_StaticNode'
 
     station_sampling_method = StationSamplingMethod.none.value
@@ -173,7 +173,7 @@ def point_model_w_static_node():
 
 def graph_model():
 
-    python_file = '/shared/home/jgiezend/wind_obs_correction/gnn_main_arbitrary.py'
+    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'GNN_Tanh'
 
     station_sampling_method = StationSamplingMethod.none.value
@@ -201,7 +201,7 @@ def graph_model():
             job.launch()
 def graph_model_w_static_nodes():
 
-    python_file = '/shared/home/jgiezend/wind_obs_correction/gnn_main_arbitrary.py'
+    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'GNN_Correction_StaticNodes'
 
     station_sampling_method = StationSamplingMethod.none.value
@@ -233,7 +233,7 @@ def graph_model_w_static_nodes():
 
 def graph_model_arbitrary_lh0():
 
-    python_file = '/shared/home/jgiezend/wind_obs_correction/gnn_main_arbitrary.py'
+    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'GNN_Arbitrary_lh0'
 
     station_sampling_method = StationSamplingMethod.random_hold_out.value
@@ -264,7 +264,7 @@ def graph_model_arbitrary_lh0():
 
 def graph_model_arbitrary():
 
-    python_file = '/shared/home/jgiezend/wind_obs_correction/gnn_main_arbitrary.py'
+    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'GNN_Arbitrary'
 
     station_sampling_method = StationSamplingMethod.random_hold_out.value

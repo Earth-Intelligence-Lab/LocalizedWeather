@@ -2,31 +2,26 @@
 # Author: Qidong Yang
 # Date: 2024-02-14
 
-import os
 import torch
 import numpy as np
-import torch.nn as nn
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from Settings.Settings import StationSamplingMethod, StaticNodeType, ModelType
+from Settings.Settings import ModelType
 
 
-def evaluationArbitraryLocation(epoch,
-                                model,
-                                data_loader,
-                                madis_network,
-                                madis_norm_dict,
-                                era5_norm_dict,
-                                device,
-                                lead_hrs,
-                                loss_function = None,
-                                optimizer=None,
-                                save=False,
-                                model_type=ModelType.GNN,
-                                station_type='train',
-                                show_progress_bar=False, figures_output_folder=None):
+def evaluate_model(model,
+                   data_loader,
+                   madis_norm_dict,
+                   era5_norm_dict,
+                   device,
+                   lead_hrs,
+                   loss_function = None,
+                   optimizer=None,
+                   save=False,
+                   model_type=ModelType.GNN,
+                   station_type='train',
+                   show_progress_bar=False):
 
     is_train = station_type == 'train'
 
@@ -75,9 +70,6 @@ def evaluationArbitraryLocation(epoch,
 
             madis_x = torch.cat((x_madis_temp.unsqueeze(3), x_madis_u.unsqueeze(3), x_madis_v.unsqueeze(3)), dim=3)
 
-            # b,s,ts,v = madis_x.shape
-            #
-            # madis_x = madis_x.view(b, s, -1)
 
             if era5_norm_dict is not None:
                 era5_u = sample[f'era5_u'].to(device)
@@ -97,10 +89,8 @@ def evaluationArbitraryLocation(epoch,
                 era5_x = torch.cat((era5_temp.unsqueeze(3), era5_u.unsqueeze(3), era5_v.unsqueeze(3)), dim=3)
 
                 b,s,t,v = era5_x.shape
-                if model_type == ModelType.MLP:
-                    era5_x = era5_x.view(b*s, t, v)
-                else:
-                    era5_x = era5_x.view(b, s, t*v)
+                era5_x = era5_x.view(b*s, t, v) if model_type == ModelType.MLP else era5_x.view(b, s, t*v)
+
             else:
                 era5_lon = None
                 era5_lat = None
@@ -177,30 +167,4 @@ def evaluationArbitraryLocation(epoch,
         return MAE_u_sum, MSE_u_sum, MAE_v_sum, MSE_v_sum
 
 
-def plot_metric(train_losses, valid_losses, test_losses, eval_interval, metric_name, output_path, y_range=None):
-
-    fig, axs = plt.subplots(1, 1, figsize=(10, 5))
-
-    epochs = len(train_losses)
-    axs.plot(np.arange(1, epochs + 1), train_losses, label='Train')
-    axs.plot(np.arange(1, epochs + 1), valid_losses, label='Valid')
-
-    x_part_1 = np.array([1])
-    x_part_2 = np.arange(1, len(test_losses)) * eval_interval
-    x_axis = np.concatenate([x_part_1, x_part_2])
-
-    axs.plot(x_axis, test_losses, label='Test')
-
-    if y_range != None:
-        axs.set_ylim(y_range[0], y_range[1])
-
-    axs.legend()
-    axs.grid()
-    axs.set_xlabel('Epochs')
-    axs.set_ylabel(metric_name)
-
-    axs.set_title(metric_name + ' Plot')
-
-    plt.savefig(os.path.join(output_path, '_'.join(metric_name.split(' ')) + '_plot.png'))
-    plt.close()
 

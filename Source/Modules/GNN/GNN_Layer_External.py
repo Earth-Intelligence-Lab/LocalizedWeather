@@ -2,7 +2,7 @@ import torch
 from torch import nn as nn
 from torch_geometric.nn import MessagePassing, InstanceNorm
 
-from Modules.GNN.Activations import Swish, Tanh
+from Source.Modules.Activations import Tanh
 
 
 class GNN_Layer_External(MessagePassing):

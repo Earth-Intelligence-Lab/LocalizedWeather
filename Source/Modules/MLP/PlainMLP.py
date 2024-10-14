@@ -2,9 +2,9 @@ import torch
 from torch import nn as nn
 
 
-class PlainMLPArbitrary(nn.Module):
+class PlainMLP(nn.Module):
     def __init__(self, Madis_len, era5_len=None, hidden_dim=128):
-        super(PlainMLPArbitrary, self).__init__()
+        super(PlainMLP, self).__init__()
 
         self.Madis_len = Madis_len
         self.hidden_dim = hidden_dim
