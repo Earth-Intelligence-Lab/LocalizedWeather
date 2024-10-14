@@ -18,10 +18,6 @@ args = AttrDict()
 
 model_name = 'MPNN'
 
-args.p_arbitrary_nodes = .2
-args.p_arbitrary_nodes_valid = .1
-args.p_arbitrary_nodes_test = .1
-# args.p_arbitrary_nodes = 0
 args.lead_hrs = 4
 args.n_neighbors_e2m = 0
 

@@ -1,14 +1,12 @@
 import os
 
-from Settings.Settings import TemporalDatasetSplit, StationSamplingMethod, StaticNodeType, ModelType
+from Settings.Settings import ModelType
 
 
 class SlurmJob(object):
-    def __init__(self, python_file, model_name, time='96:00:00', mem='32Gb', gpu='rtx8000:1', experiment_root='/shared/home/jgiezend/wind_obs_exps', **kwargs):
+    def __init__(self, python_file, model_name, time='96:00:00', experiment_root='', **kwargs):
 
         self.time = time
-        self.mem = mem
-        self.gpu = gpu
         self.kwargs = kwargs
 
         self.python_file = python_file
@@ -79,10 +77,7 @@ class SlurmJob(object):
             f'#SBATCH --time={self.time}',
             f'#SBATCH --nodes=1',
             f'#SBATCH --ntasks-per-node=1',
-            # f'#SBATCH --mem={self.mem}',
-            # f'#SBATCH --gres=gpu:{self.gpu}',
             '#SBATCH --partition=g6sherrie',
-            # '#SBATCH --cpus-per-node=1',
             '#SBATCH --gpus=1',
             '#SBATCH --gpus-per-node=1',
         ]
@@ -113,45 +108,8 @@ def point_model():
     python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'MLP'
 
-    station_sampling_method = StationSamplingMethod.none.value
-    temporal_dataset_split = TemporalDatasetSplit.holdout_fixed.value
-    static_node_type = StaticNodeType.none.value
     model_type = ModelType.MLP.value
 
-    back_hrs = 48
-    lr = 1e-4
-    lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
-    n_neighbors_e2ms = [0]
-
-    for n_neighbors_e2m in n_neighbors_e2ms:
-        for lead_hr in lead_hrs:
-            job = SlurmJob(python_file, model_name,
-                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
-                           epochs=200,
-                           lr=lr,
-                           lead_hrs=lead_hr,
-                           n_neighbors_e2m=n_neighbors_e2m,
-                           batch_size=256,
-                           station_sampling_method = station_sampling_method,
-                           temporal_dataset_split = temporal_dataset_split,
-                           static_node_type = static_node_type,
-                           model_type = model_type,
-                           shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
-            job.launch()
-
-
-def point_model_w_static_node():
-
-    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
-    model_name = 'MLP_StaticNode'
-
-    station_sampling_method = StationSamplingMethod.none.value
-    temporal_dataset_split = TemporalDatasetSplit.holdout_fixed.value
-    static_node_type = StaticNodeType.terrain_lclu.value
-    model_type = ModelType.MLP.value
-
-    back_hrs = 48
-    lr = 1e-4
     lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
     n_neighbors_e2ms = [0, 8]
 
@@ -160,57 +118,21 @@ def point_model_w_static_node():
             job = SlurmJob(python_file, model_name,
                            experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
                            epochs=200,
-                           lr=lr,
                            lead_hrs=lead_hr,
                            n_neighbors_e2m=n_neighbors_e2m,
-                           batch_size=256,
-                           station_sampling_method = station_sampling_method,
-                           temporal_dataset_split = temporal_dataset_split,
-                           static_node_type = static_node_type,
-                           model_type = model_type,
+                           model_type=model_type,
                            shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
             job.launch()
+
+
 
 def graph_model():
 
     python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
-    model_name = 'GNN_Tanh'
+    model_name = 'GNN'
 
-    station_sampling_method = StationSamplingMethod.none.value
-    temporal_dataset_split = TemporalDatasetSplit.holdout_fixed.value
-    static_node_type = StaticNodeType.none.value
-
-    back_hrs = 48
-    lr = 1e-4
-    lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
-    n_neighbors_e2ms = [0, 8]
-
-    for n_neighbors_e2m in n_neighbors_e2ms:
-        for lead_hr in lead_hrs:
-            job = SlurmJob(python_file, model_name,
-                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
-                           epochs=200,
-                           lr=lr,
-                           lead_hrs=lead_hr,
-                           n_neighbors_e2m=n_neighbors_e2m,
-                           batch_size=128,
-                           station_sampling_method = station_sampling_method,
-                           temporal_dataset_split = temporal_dataset_split,
-                           static_node_type = static_node_type,
-                           shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
-            job.launch()
-def graph_model_w_static_nodes():
-
-    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
-    model_name = 'GNN_Correction_StaticNodes'
-
-    station_sampling_method = StationSamplingMethod.none.value
-    temporal_dataset_split = TemporalDatasetSplit.holdout_fixed.value
-    static_node_type = StaticNodeType.terrain_lclu.value
     model_type = ModelType.GNN.value
 
-    back_hrs = 48
-    lr = 1e-4
     lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
     n_neighbors_e2ms = [0, 8]
 
@@ -219,85 +141,13 @@ def graph_model_w_static_nodes():
             job = SlurmJob(python_file, model_name,
                            experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
                            epochs=200,
-                           lr=lr,
                            lead_hrs=lead_hr,
                            n_neighbors_e2m=n_neighbors_e2m,
-                           batch_size=256,
-                           station_sampling_method = station_sampling_method,
-                           temporal_dataset_split = temporal_dataset_split,
-                           static_node_type = static_node_type,
-                           model_type = model_type,
+                           model_type=model_type,
                            shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
             job.launch()
-
-
-def graph_model_arbitrary_lh0():
-
-    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
-    model_name = 'GNN_Arbitrary_lh0'
-
-    station_sampling_method = StationSamplingMethod.random_hold_out.value
-    temporal_dataset_split = TemporalDatasetSplit.none.value
-    static_node_types = [StaticNodeType.terrain_lclu.value]
-
-    back_hrs = 48
-    lr = 1e-4
-    lead_hrs = [0]
-    n_neighbors_e2ms = [0]
-
-    for static_node_type in static_node_types:
-        for n_neighbors_e2m in n_neighbors_e2ms:
-            for lead_hr in lead_hrs:
-                job = SlurmJob(python_file, model_name,
-                               experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
-                               epochs=200,
-                               lr=lr,
-                               lead_hrs=lead_hr,
-                               n_neighbors_e2m=n_neighbors_e2m,
-                               batch_size=128,
-                               station_sampling_method = station_sampling_method,
-                               temporal_dataset_split = temporal_dataset_split,
-                               static_node_type = static_node_type,
-                               shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
-                job.launch()
-
-
-def graph_model_arbitrary():
-
-    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
-    model_name = 'GNN_Arbitrary'
-
-    station_sampling_method = StationSamplingMethod.random_hold_out.value
-    temporal_dataset_split = TemporalDatasetSplit.none.value
-    static_node_types = [StaticNodeType.terrain_lclu.value]
-
-    back_hrs = 48
-    lr = 1e-4
-    lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
-    n_neighbors_e2ms = [8]
-
-    for static_node_type in static_node_types:
-        for n_neighbors_e2m in n_neighbors_e2ms:
-            for lead_hr in lead_hrs:
-                job = SlurmJob(python_file, model_name,
-                               experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
-                               epochs=200,
-                               lr=lr,
-                               lead_hrs=lead_hr,
-                               n_neighbors_e2m=n_neighbors_e2m,
-                               batch_size=256,
-                               station_sampling_method = station_sampling_method,
-                               temporal_dataset_split = temporal_dataset_split,
-                               static_node_type = static_node_type,
-                               shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
-                job.launch()
 
 
 if __name__ == '__main__':
-    # graph_model()
     point_model()
-    # graph_model_arbitrary_lh0()
-    # graph_model_arbitrary()
-
-    point_model_w_static_node()
-    graph_model_w_static_nodes()
+    graph_model()

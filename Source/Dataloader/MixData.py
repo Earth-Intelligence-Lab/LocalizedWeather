@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 
 from Source.Dataloader.ERA5 import ERA5
 from Source.Dataloader.Madis import Madis
-from Source.Helpers.Normalisers import MinMaxNormalizer
+from Source.Normalization.Normalizers import MinMaxNormalizer
 
 
 class MixData(Dataset):

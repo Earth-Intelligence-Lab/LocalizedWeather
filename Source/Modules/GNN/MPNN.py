@@ -56,14 +56,10 @@ class MPNN(nn.Module):
         # madis_temp: (n_batch, n_stations, n_times)
         # madis_lon: (n_batch, n_stations, 1)
         # madis_lat: (n_batch, n_stations, 1)
-        # edge_index: (n_batch, 2, n_edges)
-        # edge_attr: (n_batch, n_edges, n_edge_features)
 
         n_batch = x.size(0)
         n_stations = x.size(1)
-        n_edges = edge_index.size(2)
 
-        # x = torch.cat((madis_temp, madis_u, madis_v), dim=2)
         # (n_batch, n_stations, n_times * 3)
         x = x.view(n_batch * n_stations, -1)
         # (n_batch * n_stations, n_times * 3)
@@ -73,18 +69,10 @@ class MPNN(nn.Module):
         pos = pos.view(n_batch * n_stations, -1)
         # (n_batch * n_stations, 2)
 
-        # node_index = torch.arange(n_stations, dtype=torch.int64).view(1, -1) * torch.ones(n_batch, 1, dtype=torch.int64)
-        # # (n_batch, n_stations, 2)
-        # node_index = node_index.view(n_batch * n_stations, ).to(x.device)
-        # # (n_batch * n_stations, 2)
-
         batch = torch.arange(n_batch).view(-1, 1) * torch.ones(1, n_stations)
         # (n_batch, n_stations)
         batch = batch.view(n_batch * n_stations, ).to(x.device)
         # (n_batch * n_stations, )
-
-
-
 
         index_shift = (torch.arange(n_batch) * n_stations).view(-1, 1, 1).to(x.device)
         edge_index = torch.cat(list(edge_index + index_shift), dim=1)
@@ -101,21 +89,10 @@ class MPNN(nn.Module):
         # ex_x: (n_batch, n_stations_e, n_features_e)
         # ex_lon: (n_batch, n_stations_e, 1)
         # ex_lat: (n_batch, n_stations_e, 1)
-        # edge_index: (n_batch, 2, n_edges)
 
         n_batch = madis_x.size(0)
         n_stations_m = madis_x.size(1)
         n_stations_e = ex_x.size(1)
-        n_edges = edge_index.size(-1)
-        '''
-        madis_x = madis_x.view(n_batch * n_stations_m, -1)
-        # (n_batch * n_stations_m, n_features_m)
-
-        madis_pos = torch.cat((madis_lon, madis_lat), dim=2)
-        # (n_batch, n_stations_m, 2)
-        madis_pos = madis_pos.view(n_batch * n_stations_m, -1)
-        # (n_batch * n_stations_m, 2)
-        '''
         ex_x = ex_x.view(n_batch * n_stations_e, -1)
         # (n_batch * n_stations_e, n_features_e)
 
@@ -129,12 +106,7 @@ class MPNN(nn.Module):
         shift = torch.cat((ex_shift, madis_shift), dim=1).unsqueeze(-1).to(madis_x.device)
         edge_index = torch.cat(list(edge_index + shift), dim=1)
         # (2, n_batch * n_edges)
-        '''
-        batch = torch.arange(n_batch).view(-1, 1) * torch.ones(1, n_stations_m)
-        # (n_batch, n_stations_m)
-        batch = batch.view(n_batch * n_stations_m, ).to(madis_x.device)
-        # (n_batch * n_stations_m, )
-        '''
+
         graph = Data(x=ex_x, pos=ex_pos, edge_index=edge_index.long())
 
         return graph
@@ -152,18 +124,8 @@ class MPNN(nn.Module):
         # madis_x: (n_batch, n_stations_m, n_hours_m, n_features_m)
         # madis_lon: (n_batch, n_stations_m, 1)
         # madis_lat: (n_batch, n_stations_m, 1)
-        # edge_index: (n_batch, 2, n_edges_m2m)
-        # edge_attr: (n_batch, n_edges_m2m, n_edge_features)
-        # edge_index_e2m: (n_batch, 2, n_edges_e2m)
-
-        # mask = (~torch.isin(edge_index[0, 0, :], arbitrary_nodes))
-        # edge_index = edge_index[:, :, mask]
-        # edge_attr = edge_attr[:, mask, :]
 
         n_batch, n_stations_m, n_hours_m, n_features_m = madis_x.shape
-        # n_batch = madis_x.size(0)
-        # n_stations_m = madis_x.size(1)
-        #n_edges = edge_attr.size(1)
 
         madis_x = madis_x.view(n_batch, n_stations_m, -1)
 
@@ -176,12 +138,7 @@ class MPNN(nn.Module):
         edge_index_m2m = in_graph.edge_index
         # 2, n_batch * n_stations * n_neighbours
 
-        # arbitrary_nodes_mask = torch.isin(node_index, arbitrary_nodes)
-
-
         in_x = self.embedding_mlp(torch.cat((u, in_pos), dim=-1))
-
-
 
         if ex_x is not None:
             ex_graph = self.build_graph_external(madis_x, ex_x, ex_lon, ex_lat, edge_index_e2m)
@@ -204,6 +161,5 @@ class MPNN(nn.Module):
         # (n_batch * n_stations, 2)
         out = out.view(n_batch, n_stations_m, self.n_out_features)
         # (n_batch, n_stations, 2)
-
 
         return out
