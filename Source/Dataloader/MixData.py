@@ -13,7 +13,8 @@ from Source.Normalization.Normalizers import MinMaxNormalizer
 
 
 class MixData(Dataset):
-    def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network, root_path=Path('')):
+    def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network,
+                 root_path=Path('')):
         # meta_station: MetaStation object
 
         self.year = year
@@ -24,10 +25,13 @@ class MixData(Dataset):
 
         self.era5_network = era5_network
         if self.era5_network is not None:
-            self.ERA5 = ERA5(meta_station.lat_low, meta_station.lat_up, meta_station.lon_low, meta_station.lon_up, self.year, root_path=root_path)
+            self.ERA5 = ERA5(meta_station.lat_low, meta_station.lat_up, meta_station.lon_low, meta_station.lon_up,
+                             self.year, root_path=root_path)
             self.era5_data = self.ERA5.data
 
-        self.time_line = pd.to_datetime(pd.Series(list(rrule.rrule(rrule.HOURLY, dtstart=datetime.strptime(f'{year}-01-01', '%Y-%m-%d'), until=datetime.strptime(f'{year+1}-01-01', '%Y-%m-%d')))[0:-1])).to_xarray()
+        self.time_line = pd.to_datetime(pd.Series(list(
+            rrule.rrule(rrule.HOURLY, dtstart=datetime.strptime(f'{year}-01-01', '%Y-%m-%d'),
+                        until=datetime.strptime(f'{year + 1}-01-01', '%Y-%m-%d')))[0:-1])).to_xarray()
 
         self.stations = meta_station.stations
         stations_raw = meta_station.stations_raw
@@ -37,7 +41,9 @@ class MixData(Dataset):
         self.stat_lats = np.array([i.y for i in self.stat_coords])
         self.n_stations = len(self.stat_coords)
 
-        self.Madis = Madis(self.time_line, stat_coords_raw, self.stat_coords, meta_station.lat_low, meta_station.lat_up, meta_station.lon_low, meta_station.lon_up, meta_station.file_name, meta_station.filtered_file_name, meta_station.n_years, root_path=root_path)
+        self.Madis = Madis(self.time_line, stat_coords_raw, self.stat_coords, meta_station.lat_low, meta_station.lat_up,
+                           meta_station.lon_low, meta_station.lon_up, meta_station.file_name,
+                           meta_station.filtered_file_name, meta_station.n_years, root_path=root_path)
         self.madis_data = self.Madis.ds_xr
 
         self.madis_u_min = np.min(self.madis_data.u.values)
@@ -99,11 +105,16 @@ class MixData(Dataset):
             f'k_edge_index': self.madis_network.k_edge_index,
         }
 
-
         if self.era5_network is not None:
-            era5_u = torch.from_numpy(np.moveaxis(self.era5_data.u10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape((self.era5_network.era5_pos.size(0), -1)))
-            era5_v = torch.from_numpy(np.moveaxis(self.era5_data.v10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape((self.era5_network.era5_pos.size(0), -1)))
-            era5_temp = torch.from_numpy(np.moveaxis(self.era5_data.t2m.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape((self.era5_network.era5_pos.size(0), -1)))
+            era5_u = torch.from_numpy(
+                np.moveaxis(self.era5_data.u10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
+                    (self.era5_network.era5_pos.size(0), -1)))
+            era5_v = torch.from_numpy(
+                np.moveaxis(self.era5_data.v10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
+                    (self.era5_network.era5_pos.size(0), -1)))
+            era5_temp = torch.from_numpy(
+                np.moveaxis(self.era5_data.t2m.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
+                    (self.era5_network.era5_pos.size(0), -1)))
 
             sample[f'e2m_edge_index'] = self.era5_network.e2m_edge_index
             sample[f'era5_u'] = era5_u

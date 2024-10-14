@@ -9,7 +9,8 @@ from shapely import points
 
 
 class Madis(object):
-    def __init__(self, times, coords_raw, coords, lat_low, lat_up, lon_low, lon_up, file_name, filtered_file_name, n_years=5,
+    def __init__(self, times, coords_raw, coords, lat_low, lat_up, lon_low, lon_up, file_name, filtered_file_name,
+                 n_years=5,
                  root_path=Path('')):
 
         # n_years comes from meta station
@@ -37,7 +38,7 @@ class Madis(object):
         self.root_path = root_path
 
         meta_year_cover = f'Meta--{2024 - self.n_years}--2023'
-        meta_year_folder = self.root_path/f'madis/processed/{meta_year_cover}'
+        meta_year_folder = self.root_path / f'madis/processed/{meta_year_cover}'
         # meta_year_folder = self.root_path/f'madis/SyntheticERA5/{meta_year_cover}'
         madis_raw_filename = f'madis_{self.years[0]}_{file_name}.nc'
         madis_filename = f'madis_{self.years[0]}_{filtered_file_name}.nc'
@@ -79,30 +80,29 @@ class Madis(object):
                 madis_ds[:, i, :] = madis_var
 
             rawData = xr.Dataset(
-                    {
-                        'u': (['stations', 'time'], madis_ds[:, 0, :]),
-                        'u_is_real': (['stations', 'time'], madis_var_is_real[:, 0, :]),
-                        'v': (['stations', 'time'], madis_ds[:, 1, :]),
-                        'v_is_real': (['stations', 'time'], madis_var_is_real[:, 1, :]),
-                        'temp': (['stations', 'time'], madis_ds[:, 2, :]),
-                        'temp_is_real': (['stations', 'time'], madis_var_is_real[:, 2, :]),
-                        'dewpoint': (['stations', 'time'], madis_ds[:, 3, :]),
-                        'dewpoint_is_real': (['stations', 'time'], madis_var_is_real[:, 3, :]),
-                        'solar_radiation': (['stations', 'time'], madis_ds[:, 4, :]),
-                        'solar_radiation_is_real': (['stations', 'time'], madis_var_is_real[:, 4, :]),
-                        'elv': (['stations'], madis_ds[:, 5, 0]),
-                        'lon': (['stations'], self.lons_raw),
-                        'lat': (['stations'], self.lats_raw),
-                    },
-                    coords={
-                        'stations': np.arange(1, len(self.coords_raw) + 1),
-                        'time': self.times.values,
-                    },
+                {
+                    'u': (['stations', 'time'], madis_ds[:, 0, :]),
+                    'u_is_real': (['stations', 'time'], madis_var_is_real[:, 0, :]),
+                    'v': (['stations', 'time'], madis_ds[:, 1, :]),
+                    'v_is_real': (['stations', 'time'], madis_var_is_real[:, 1, :]),
+                    'temp': (['stations', 'time'], madis_ds[:, 2, :]),
+                    'temp_is_real': (['stations', 'time'], madis_var_is_real[:, 2, :]),
+                    'dewpoint': (['stations', 'time'], madis_ds[:, 3, :]),
+                    'dewpoint_is_real': (['stations', 'time'], madis_var_is_real[:, 3, :]),
+                    'solar_radiation': (['stations', 'time'], madis_ds[:, 4, :]),
+                    'solar_radiation_is_real': (['stations', 'time'], madis_var_is_real[:, 4, :]),
+                    'elv': (['stations'], madis_ds[:, 5, 0]),
+                    'lon': (['stations'], self.lons_raw),
+                    'lat': (['stations'], self.lats_raw),
+                },
+                coords={
+                    'stations': np.arange(1, len(self.coords_raw) + 1),
+                    'time': self.times.values,
+                },
             )
 
             rawData.to_netcdf(self.madis_raw_ds_path)
         return rawData
-
 
     def loadData(self):
         madis_ds = []
@@ -120,7 +120,7 @@ class Madis(object):
         return madis_ds
 
     def load_madis_monthly(self, year, month):
-        data_path = self.root_path/f'madis/raw_monthly/mesonet/{year}/{month}.nc'
+        data_path = self.root_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
 
         data = xr.open_dataset(data_path)
 
@@ -161,8 +161,8 @@ class Madis(object):
             solarRadiation_check = ((data.solarRadiation.values == b'S') + (data.solarRadiation.values == b'V'))
             solarRadiation_obs[~solarRadiation_check] = np.nan
 
-            u_obs = np.cos( np.deg2rad(270 - wd_obs) ) * ws_obs
-            v_obs = np.sin( np.deg2rad(270 - wd_obs) ) * ws_obs
+            u_obs = np.cos(np.deg2rad(270 - wd_obs)) * ws_obs
+            v_obs = np.sin(np.deg2rad(270 - wd_obs)) * ws_obs
 
             coords = points(np.concatenate([lon_obs.reshape(-1, 1), lat_obs.reshape(-1, 1)], axis=1))
 

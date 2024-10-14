@@ -2,8 +2,8 @@
 # Author: Qidong Yang
 # Date: 2024-02-14
 
-import torch
 import numpy as np
+import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
@@ -16,13 +16,12 @@ def evaluate_model(model,
                    era5_norm_dict,
                    device,
                    lead_hrs,
-                   loss_function = None,
+                   loss_function=None,
                    optimizer=None,
                    save=False,
                    model_type=ModelType.GNN,
                    station_type='train',
                    show_progress_bar=False):
-
     is_train = station_type == 'train'
 
     MSE_u_sum = 0
@@ -50,7 +49,6 @@ def evaluate_model(model,
             madis_temp = sample[f'madis_temp'].to(device)
             # (n_batch, n_stations, n_times)
 
-
             madis_lon = sample[f'madis_lon'].to(device)
             madis_lat = sample[f'madis_lat'].to(device)
 
@@ -61,15 +59,14 @@ def evaluate_model(model,
 
             madis_matrix_len = madis_u.shape[2]
 
-            x_madis_u = madis_u[:, :, :madis_matrix_len-lead_hrs]
-            x_madis_v = madis_v[:, :, :madis_matrix_len-lead_hrs]
-            x_madis_temp = madis_temp[:, :, :madis_matrix_len-lead_hrs]
+            x_madis_u = madis_u[:, :, :madis_matrix_len - lead_hrs]
+            x_madis_v = madis_v[:, :, :madis_matrix_len - lead_hrs]
+            x_madis_temp = madis_temp[:, :, :madis_matrix_len - lead_hrs]
 
             y_u = madis_u[:, :, [-1]]
             y_v = madis_v[:, :, [-1]]
 
             madis_x = torch.cat((x_madis_temp.unsqueeze(3), x_madis_u.unsqueeze(3), x_madis_v.unsqueeze(3)), dim=3)
-
 
             if era5_norm_dict is not None:
                 era5_u = sample[f'era5_u'].to(device)
@@ -88,8 +85,8 @@ def evaluate_model(model,
 
                 era5_x = torch.cat((era5_temp.unsqueeze(3), era5_u.unsqueeze(3), era5_v.unsqueeze(3)), dim=3)
 
-                b,s,t,v = era5_x.shape
-                era5_x = era5_x.view(b*s, t, v) if model_type == ModelType.MLP else era5_x.view(b, s, t*v)
+                b, s, t, v = era5_x.shape
+                era5_x = era5_x.view(b * s, t, v) if model_type == ModelType.MLP else era5_x.view(b, s, t * v)
 
             else:
                 era5_lon = None
@@ -101,10 +98,10 @@ def evaluate_model(model,
                 optimizer.zero_grad()
 
             if model_type == ModelType.MLP:
-                b,s,t,v = madis_x.shape
-                madis_x = madis_x.view(b*s, t, v)
+                b, s, t, v = madis_x.shape
+                madis_x = madis_x.view(b * s, t, v)
                 out = model(madis_x, b, era5_x)
-                _,v = out.shape
+                _, v = out.shape
                 out = out.view(b, s, v)
             else:
                 out = model(madis_x,
@@ -114,7 +111,6 @@ def evaluate_model(model,
                             era5_lat,
                             era5_x,
                             edge_index_e2m)
-
 
             y_u = madis_norm_dict['u'].decode(y_u)
             y_v = madis_norm_dict['v'].decode(y_v)
@@ -126,12 +122,10 @@ def evaluate_model(model,
             out = torch.cat((out_u, out_v), dim=2)
             # (n_batch, n_stations, 2)
 
-
             if is_train:
                 ls = loss_function(out, y)
                 ls.backward()
                 optimizer.step()
-
 
             if save == True:
                 Pred_list.append(out.detach().cpu().numpy())
@@ -151,7 +145,6 @@ def evaluate_model(model,
             MSE_u_sum = MSE_u_sum + np.sum(mse_u)
             MSE_v_sum = MSE_v_sum + np.sum(mse_v)
 
-
             mae_u = torch.sum(F.l1_loss(out_u, y_u, reduction='none'), dim=0).cpu().numpy()
             # (n_stations, 1)
             mae_v = torch.sum(F.l1_loss(out_v, y_v, reduction='none'), dim=0).cpu().numpy()
@@ -159,12 +152,10 @@ def evaluate_model(model,
 
             MAE_u_sum = MAE_u_sum + np.sum(mae_u)
             MAE_v_sum = MAE_v_sum + np.sum(mae_v)
-    
+
     if save == True:
-        return MAE_u_sum, MSE_u_sum, MAE_v_sum, MSE_v_sum, np.concatenate(Pred_list, axis=0), np.concatenate(Target_list, axis=0)
+        return MAE_u_sum, MSE_u_sum, MAE_v_sum, MSE_v_sum, np.concatenate(Pred_list, axis=0), np.concatenate(
+            Target_list, axis=0)
 
     else:
         return MAE_u_sum, MSE_u_sum, MAE_v_sum, MSE_v_sum
-
-
-

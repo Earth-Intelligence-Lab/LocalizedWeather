@@ -40,7 +40,6 @@ parser.add_argument('--show_progress_bar', default=False, type=bool)
 parser.add_argument('--root_path', default='/shared/home/jgiezend/data/WindData/', type=str)
 parser.add_argument('--output_saving_path', default='tmp', type=str)
 
-
 ## process args
 args = parser.parse_args()
 
@@ -53,7 +52,7 @@ for k in save_args.keys():
         save_args[k] = v.name
 
 # save config to json
-outputPath = (Path(args.output_saving_path)/'params.json')
+outputPath = (Path(args.output_saving_path) / 'params.json')
 
 with open(outputPath, 'w') as f:
     json.dump(save_args, f)

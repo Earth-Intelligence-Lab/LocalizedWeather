@@ -5,26 +5,25 @@
 import os
 import pickle
 from pathlib import Path
+
 import geopandas as gpd
 import numpy as np
-
 import torch
 from matplotlib import pyplot as plt
 from torch import nn
+from torch.utils.data import DataLoader, ConcatDataset
 
+import Source.Normalization.NormalizerBuilder as NormalizerBuilder
 from Dataloader.ERA5 import ERA5
 from Dataloader.MetaStation import MetaStation
 from Dataloader.MixData import MixData
 from Dataloader.MixDataMLP import MixDataMLP
+from EvaluateModel import evaluate_model
 from Modules.GNN.MPNN import MPNN
 from Modules.MLP.PlainMLP import PlainMLP
 from Network.ERA5Network import ERA5Network
 from Network.MadisNetwork import MadisNetwork
 from Settings.Settings import ModelType
-from torch.utils.data import DataLoader, ConcatDataset
-
-from EvaluateModel import evaluate_model
-import Source.Normalization.NormalizerBuilder as NormalizerBuilder
 
 
 def Run(args):
@@ -260,7 +259,7 @@ def Run(args):
                 np.save(os.path.join(output_saving_path, f'min_test_v_mse.npy'), test_v_mse)
 
             print('Evaluation Report: test_u_mae[%.3f] test_u_mse[%.3f] test_v_mae[%.3f] test_v_mse[%.3f]' % (
-            test_u_mae, test_u_mse, test_v_mae, test_v_mse), flush=True)
+                test_u_mae, test_u_mse, test_v_mae, test_v_mse), flush=True)
             print(' ', flush=True)
 
             np.save(os.path.join(output_saving_path, f'station_train_test_u_mae_epoch_{epoch + 1}.npy'),

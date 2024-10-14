@@ -26,9 +26,10 @@ class MetaStation(object):
             self.file_name += self.shapefile_path.stem
         self.filtered_file_name = self.file_name + f'_filtered_{self.control_ratio}'
 
-        self.all_station_file = root_path/(f'madis/stations/stations_{self.start_year}_2023_{self.file_name}.shp')
-        self.station_file = root_path/(f'madis/stations/stations_{self.start_year}_2023_{self.filtered_file_name}.shp')
-        self.data_dir = lambda year, month: root_path/f'madis/raw_monthly/mesonet/{year}/{month}.nc'
+        self.all_station_file = root_path / (f'madis/stations/stations_{self.start_year}_2023_{self.file_name}.shp')
+        self.station_file = root_path / (
+            f'madis/stations/stations_{self.start_year}_2023_{self.filtered_file_name}.shp')
+        self.data_dir = lambda year, month: root_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
 
         Path(self.all_station_file).parent.mkdir(exist_ok=True, parents=True)
 
@@ -45,7 +46,6 @@ class MetaStation(object):
     def generate_station_table(self):
         print('Generating station table')
         counter = Counter([])
-        #max_list = []
 
         for year in range(self.start_year, 2024):
             print(f'Generating station table for year {year}', flush=True)
@@ -73,9 +73,10 @@ class MetaStation(object):
                 data = data.sel(index=ind)
 
                 if len(data.index) > 0:
-                    coords_sub = data[['longitude', 'latitude','year','month','day','hour']].to_pandas().reset_index(drop=True).drop_duplicates()[['longitude','latitude']].values
+                    coords_sub = \
+                    data[['longitude', 'latitude', 'year', 'month', 'day', 'hour']].to_pandas().reset_index(
+                        drop=True).drop_duplicates()[['longitude', 'latitude']].values
                     counter = counter + Counter(points(coords_sub))
-
 
         counter = gpd.GeoDataFrame(pd.Series(counter).reset_index().rename(columns={'index': 'geometry', 0: 'num'}))
 

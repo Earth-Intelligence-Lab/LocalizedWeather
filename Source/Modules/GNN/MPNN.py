@@ -2,9 +2,9 @@ import torch
 from torch import nn as nn
 from torch_geometric.data import Data
 
+from Source.Modules.Activations import Tanh
 from Source.Modules.GNN.GNN_Layer_External import GNN_Layer_External
 from Source.Modules.GNN.GNN_Layer_Internal import GNN_Layer_Internal
-from Source.Modules.Activations import Tanh
 
 
 class MPNN(nn.Module):
@@ -25,16 +25,17 @@ class MPNN(nn.Module):
         self.hidden_dim = hidden_dim
         self.n_out_features = n_out_features
 
-        self.gnn_ex_1 = GNN_Layer_External(in_dim=self.hidden_dim, out_dim=self.hidden_dim, hidden_dim=self.hidden_dim, ex_in_dim=self.n_node_features_e)
-        self.gnn_ex_2 = GNN_Layer_External(in_dim=self.hidden_dim, out_dim=self.hidden_dim, hidden_dim=self.hidden_dim, ex_in_dim=self.n_node_features_e)
-
+        self.gnn_ex_1 = GNN_Layer_External(in_dim=self.hidden_dim, out_dim=self.hidden_dim, hidden_dim=self.hidden_dim,
+                                           ex_in_dim=self.n_node_features_e)
+        self.gnn_ex_2 = GNN_Layer_External(in_dim=self.hidden_dim, out_dim=self.hidden_dim, hidden_dim=self.hidden_dim,
+                                           ex_in_dim=self.n_node_features_e)
 
         self.gnn_layers = nn.ModuleList(modules=(
             GNN_Layer_Internal(
-            in_dim=self.hidden_dim,
-            hidden_dim=self.hidden_dim,
-            out_dim=self.hidden_dim,
-            org_in_dim=self.n_node_features_m)
+                in_dim=self.hidden_dim,
+                hidden_dim=self.hidden_dim,
+                out_dim=self.hidden_dim,
+                org_in_dim=self.n_node_features_m)
             for _ in range(self.n_passing)))
 
         self.embedding_mlp = nn.Sequential(
@@ -43,12 +44,9 @@ class MPNN(nn.Module):
             nn.Linear(self.hidden_dim, self.hidden_dim),
             Tanh())
 
-
         self.output_mlp = nn.Sequential(nn.Linear(self.hidden_dim, self.hidden_dim),
                                         Tanh(),
                                         nn.Linear(self.hidden_dim, self.n_out_features))
-
-
 
     def build_graph_internal(self, x, madis_lon, madis_lat, edge_index):
         # madis_u: (n_batch, n_stations, n_times)
@@ -129,7 +127,6 @@ class MPNN(nn.Module):
 
         madis_x = madis_x.view(n_batch, n_stations_m, -1)
 
-
         in_graph = self.build_graph_internalbuild_graph_internal(madis_x, madis_lon, madis_lat, edge_index)
 
         u = in_graph.x
@@ -145,7 +142,6 @@ class MPNN(nn.Module):
             ex_x = ex_graph.x
             ex_pos = ex_graph.pos
             edge_index_e2m = ex_graph.edge_index
-
 
         if ex_x is not None:
             in_x = self.gnn_ex_1(in_x, ex_x, in_pos, ex_pos, edge_index_e2m, batch)

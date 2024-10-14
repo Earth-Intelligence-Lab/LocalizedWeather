@@ -14,13 +14,11 @@ class MinMaxNormalizer(object):
         self.eps = eps
 
     def encode(self, x):
-
         x = (x - self.min) / (self.max - self.min + self.eps)
 
         return x
 
     def decode(self, x):
-
         x = x * (self.max - self.min + self.eps) + self.min
 
         return x
@@ -40,13 +38,11 @@ class ABNormalizer(object):
         self.delta = (self.b - self.a) / (self.max - self.min + self.eps)
 
     def encode(self, x):
-
         x = (x - self.min) * self.delta + self.a
 
         return x
 
     def decode(self, x):
-
         x = (x - self.a) / self.delta + self.min
 
         return x

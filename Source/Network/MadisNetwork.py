@@ -17,18 +17,16 @@ class MadisNetwork:
 
         self.stations = np.arange(self.n_stations)
 
-
-        self.pos = torch.cat([torch.from_numpy(self.stat_lons.reshape((-1, 1))), torch.from_numpy(self.stat_lats.reshape((-1, 1)))], dim=1)
+        self.pos = torch.cat(
+            [torch.from_numpy(self.stat_lons.reshape((-1, 1))), torch.from_numpy(self.stat_lats.reshape((-1, 1)))],
+            dim=1)
 
         self.madis_lon = torch.from_numpy(self.stat_lons).reshape((-1, 1))
         self.madis_lat = torch.from_numpy(self.stat_lats).reshape((-1, 1))
 
         self.k_edge_index = self.BuildMadisNetwork(self.madis_lon, self.madis_lat)
 
-
     def BuildMadisNetwork(self, lon, lat):
-
-
         pos = torch.cat([lon, lat], dim=1)
         k_edge_index = knn_graph(pos, k=self.n_neighbors_m2m, batch=torch.zeros((len(pos),)), loop=False)
 

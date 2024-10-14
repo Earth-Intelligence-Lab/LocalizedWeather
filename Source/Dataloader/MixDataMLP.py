@@ -10,7 +10,8 @@ from Source.Dataloader.MixData import MixData
 class MixDataMLP(MixData):
     def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m,
                  era5_network, root_path=Path('')):
-        MixData.__init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network, root_path)
+        MixData.__init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network,
+                         root_path)
 
         if self.era5_network is not None:
 
@@ -53,14 +54,17 @@ class MixDataMLP(MixData):
             solar_radiation = np.stack(sumdf.solar_radiation.values)
 
             data = self.madis_data.copy()
-            data = data.drop(['u_is_real', 'v_is_real', 'temp_is_real', 'dewpoint_is_real', 'solar_radiation_is_real', 'elv'])
+            data = data.drop(
+                ['u_is_real', 'v_is_real', 'temp_is_real', 'dewpoint_is_real', 'solar_radiation_is_real', 'elv'])
             data.u.values = u
             data.v.values = v
             data.temp.values = temp
             data.dewpoint.values = dewpoint
             data.solar_radiation.values = solar_radiation
 
-            data = data.rename(dict({'u': 'u10', 'v': 'v10', 'temp': 't2m', 'dewpoint': 'd2m', 'solar_radiation': 'ssr', 'lon': 'era5_lons', 'lat': 'era5_lats'}))
+            data = data.rename(dict(
+                {'u': 'u10', 'v': 'v10', 'temp': 't2m', 'dewpoint': 'd2m', 'solar_radiation': 'ssr', 'lon': 'era5_lons',
+                 'lat': 'era5_lats'}))
 
             interpolated_file_path.parent.mkdir(exist_ok=True, parents=True)
             data.to_netcdf(interpolated_file_path)

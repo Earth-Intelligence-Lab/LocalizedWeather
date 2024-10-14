@@ -1,6 +1,5 @@
-from pathlib import Path
-
 import json
+from pathlib import Path
 
 from Settings.Settings import *
 from Source import GNN_Main
@@ -21,8 +20,8 @@ model_name = 'MPNN'
 args.lead_hrs = 4
 args.n_neighbors_e2m = 0
 
-args.output_saving_path = f'ModelOutputs/{model_name}_' + ''.join([f'_{k}={v.name if issubclass(type(v), Enum) else v}' for k, v in args.items()])
-
+args.output_saving_path = f'ModelOutputs/{model_name}_' + ''.join(
+    [f'_{k}={v.name if issubclass(type(v), Enum) else v}' for k, v in args.items()])
 
 ######### args after this are not included in path name
 
@@ -53,7 +52,7 @@ args.eval_interval = 5
 args.root_path = '/Users/jonathangiezendanner/Documents/MIT/Projects/WindData/'
 args.show_progress_bar = True
 
-outputPath = (Path(args.root_path).parent/'ModelOutputs'/args.output_saving_path/'params.json')
+outputPath = (Path(args.root_path).parent / 'ModelOutputs' / args.output_saving_path / 'params.json')
 
 outputPath.parent.mkdir(exist_ok=True, parents=True)
 

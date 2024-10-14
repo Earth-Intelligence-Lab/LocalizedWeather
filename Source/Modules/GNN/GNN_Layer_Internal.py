@@ -9,6 +9,7 @@ class GNN_Layer_Internal(MessagePassing):
     """
     Internal message passing layer
     """
+
     def __init__(self, in_dim, out_dim, hidden_dim, org_in_dim):
         """
         Initialize message passing layers

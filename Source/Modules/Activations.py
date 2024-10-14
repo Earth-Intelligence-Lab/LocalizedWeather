@@ -6,6 +6,7 @@ class Sigmoid(nn.Module):
     """
     Sigmoid activation function
     """
+
     def __init__(self):
         super(Sigmoid, self).__init__()
 
@@ -17,6 +18,7 @@ class Tanh(nn.Module):
     """
     Tanh activation function
     """
+
     def __init__(self):
         super(Tanh, self).__init__()
 
@@ -28,9 +30,10 @@ class Swish(nn.Module):
     """
     Swish activation function
     """
+
     def __init__(self, beta=1):
         super(Swish, self).__init__()
         self.beta = beta
 
     def forward(self, x):
-        return x * torch.sigmoid(self.beta*x)
+        return x * torch.sigmoid(self.beta * x)

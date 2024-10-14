@@ -4,8 +4,6 @@ from Source.Normalization.Normalizers import MinMaxNormalizer, ABNormalizer
 
 
 def get_normalizers(Data_List, era5_network):
-
-
     ##### Get Normalizer #####
     madis_u_mins = []
     madis_v_mins = []
@@ -39,7 +37,6 @@ def get_normalizers(Data_List, era5_network):
     madis_v_normalizer = ABNormalizer(-madis_scale, madis_scale, -1.0, 1.0)
     madis_norm_dict = {'u': madis_u_normalizer, 'v': madis_v_normalizer, 'temp': madis_temp_normalizer}
 
-
     if era5_network is not None:
         era5_u_mins = []
         era5_v_mins = []
@@ -50,7 +47,6 @@ def get_normalizers(Data_List, era5_network):
         era5_temp_maxs = []
 
         for Data in Data_List:
-
             era5_u_mins.append(Data.era5_u_min)
             era5_v_mins.append(Data.era5_v_min)
             era5_temp_mins.append(Data.era5_temp_min)

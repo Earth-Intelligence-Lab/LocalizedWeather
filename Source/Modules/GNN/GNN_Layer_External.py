@@ -9,6 +9,7 @@ class GNN_Layer_External(MessagePassing):
     """
     External message passing layer
     """
+
     def __init__(self, in_dim, out_dim, hidden_dim, ex_in_dim):
         """
         Initialize message passing layers
@@ -52,7 +53,7 @@ class GNN_Layer_External(MessagePassing):
 
         x = torch.cat((in_x, ex_x), dim=0)
         pos = torch.cat((in_pos, ex_pos), dim=0)
-        #edge_index[0] = edge_index[0] + n_in_x
+        
         index_shift = torch.zeros_like(edge_index)
         index_shift[0] = index_shift[0] + n_in_x
 

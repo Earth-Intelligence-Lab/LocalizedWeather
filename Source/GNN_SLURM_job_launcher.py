@@ -104,7 +104,6 @@ class SlurmJob(object):
 
 
 def point_model():
-
     python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'MLP'
 
@@ -125,9 +124,7 @@ def point_model():
             job.launch()
 
 
-
 def graph_model():
-
     python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'GNN'
 
