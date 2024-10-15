@@ -37,5 +37,47 @@ The code is organised as follows (in `Source/`):
 - the folder `Dataloader/` contains the data loaders for MADIS and ERA5, and the combination of both, and the folder `Network/` the code for the network construction, for both the internal (MADIS) and external (ERA5 to MADIS) connections
 - `Modules/GNN/MPNN.py` contains the code for the heterogeneous message passing neural network and calls `GNN_Layer_Internal/External.py`, the message passing sequences between the networks
 
-
-
+### Code inputs
+The code expects the following data structure, you need to specify the root data path in the launcher:
+```
+RootDataPath/
+├── ERA5
+│   ├── Interpolated
+│   │   ├── era5interpolated_e2m_8_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   ├── era5interpolated_e2m_8_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   ├── era5interpolated_e2m_8_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   ├── era5interpolated_e2m_8_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   └── era5interpolated_e2m_8_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   └── Processed
+│       ├── era5_2019_-83_-65_37_49.nc
+│       ├── era5_2020_-83_-65_37_49.nc
+│       ├── era5_2021_-83_-65_37_49.nc
+│       ├── era5_2022_-83_-65_37_49.nc
+│       └── era5_2023_-83_-65_37_49.nc
+├── Shapefiles
+│   └── Regions
+│       ├── northeastern_buffered.cpg
+│       ├── northeastern_buffered.dbf
+│       ├── northeastern_buffered.prj
+│       ├── northeastern_buffered.shp
+│       └── northeastern_buffered.shx
+└── madis
+    ├── processed
+    │   └── Meta--2019--2023
+    │       ├── madis_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       ├── madis_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       ├── madis_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       ├── madis_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       └── madis_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    └── stations
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.cpg
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.dbf
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.prj
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.shp
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.shx
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.cpg
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.dbf
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.prj
+        ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.shp
+        └── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.shx
+```
