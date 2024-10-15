@@ -53,7 +53,7 @@ class GNN_Layer_External(MessagePassing):
 
         x = torch.cat((in_x, ex_x), dim=0)
         pos = torch.cat((in_pos, ex_pos), dim=0)
-        
+
         index_shift = torch.zeros_like(edge_index)
         index_shift[0] = index_shift[0] + n_in_x
 
