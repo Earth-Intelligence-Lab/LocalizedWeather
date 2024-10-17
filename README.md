@@ -30,7 +30,7 @@ For MADIS and ERA5, the following variables are available:
 - solar radiation
 
 The data can also be generated from scratch.
-For this, code is available under `Source/DataDownload/{ERA5/MADIS}` for the raw data download, and in the respective data loaders for the data processing (`Source/Dataloader/{ERA5/Madis}`).
+For this, code is available under `Source/DataDownload/{ERA5/MADIS}.py` for the raw data download, and in the respective data loaders for the data processing (`Source/Dataloader/{ERA5/MetaStation/Madis/MixDataMLP}.py`).
 
 ## Code
 The code is organised as follows (in `Source/`):
