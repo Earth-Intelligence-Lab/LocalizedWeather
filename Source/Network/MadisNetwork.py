@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import numpy as np
 import torch
 from torch_geometric.nn import knn_graph
@@ -11,8 +13,8 @@ class MadisNetwork:
 
         self.stations = meta_station.stations
         self.stat_coords = list(self.stations['geometry'])
-        self.stat_lons = np.array([i.x for i in self.stat_coords])
-        self.stat_lats = np.array([i.y for i in self.stat_coords])
+        self.stat_lons = np.array([i.x for i in self.stat_coords]).astype(np.float32)
+        self.stat_lats = np.array([i.y for i in self.stat_coords]).astype(np.float32)
         self.n_stations = len(self.stat_coords)
 
         self.stations = np.arange(self.n_stations)

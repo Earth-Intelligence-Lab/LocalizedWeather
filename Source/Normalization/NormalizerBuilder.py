@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import numpy as np
 
 from Source.Normalization.Normalizers import MinMaxNormalizer, ABNormalizer

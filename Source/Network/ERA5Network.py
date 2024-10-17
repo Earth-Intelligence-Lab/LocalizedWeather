@@ -36,8 +36,8 @@ class ERA5Network:
     def BuildIntepolationWeight(self, edges, lon_e, lat_e, lon_m, lat_m):
         lon_e = lon_e[edges[0, :]]
         lat_e = lat_e[edges[0, :]]
-        lon_m = torch.from_numpy(lon_m[edges[1, :]], dtype=lon_e.dtype)
-        lat_m = torch.from_numpy(lat_m[edges[1, :]], dtype=lat_e.dtype)
+        lon_m = torch.from_numpy(lon_m[edges[1, :]].astype(np.float32))
+        lat_m = torch.from_numpy(lat_m[edges[1, :]].astype(np.float32))
 
         delta_lon = lon_e - lon_m
         delta_lat = lat_e - lat_m

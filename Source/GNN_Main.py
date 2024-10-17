@@ -1,5 +1,5 @@
 # This file is used to train wind correction model and evaluate it.
-# Author: Qidong Yang
+# Author: Qidong Yang & Jonathan Giezendanner
 # Date: 2024-02-14
 
 import os
@@ -169,7 +169,7 @@ def Run(args):
         test_epoch = (epoch + 1) % eval_interval == 0 or epoch == 0
 
         call_evaluate = lambda dataset, save: evaluate_model(
-            epoch,
+            model,
             loaders[dataset],
             madis_norm_dict,
             era5_norm_dict,

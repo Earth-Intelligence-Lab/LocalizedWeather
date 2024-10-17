@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 from datetime import datetime
 from pathlib import Path
 
@@ -87,9 +89,9 @@ class MixData(Dataset):
 
         time_sel = self.time_line[index_start:index_end + 1]
 
-        madis_u = self.madis_data.u.sel(time=slice(time_sel[0], time_sel[-1])).values
-        madis_v = self.madis_data.v.sel(time=slice(time_sel[0], time_sel[-1])).values
-        madis_temp = self.madis_data.temp.sel(time=slice(time_sel[0], time_sel[-1])).values
+        madis_u = self.madis_data.u.sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32)
+        madis_v = self.madis_data.v.sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32)
+        madis_temp = self.madis_data.temp.sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32)
         # (n_stations, n_times)
 
         madis_u = torch.from_numpy(madis_u)

@@ -1,5 +1,5 @@
 # This file contains utility functions for this project.
-# Author: Qidong Yang
+# Author: Qidong Yang & Jonathan Giezendanner
 # Date: 2024-02-14
 
 

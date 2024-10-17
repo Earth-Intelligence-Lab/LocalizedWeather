@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import os
 
 from Settings.Settings import ModelType

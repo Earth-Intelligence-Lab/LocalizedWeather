@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import torch
 from torch import nn as nn
 from torch_geometric.nn import MessagePassing, InstanceNorm

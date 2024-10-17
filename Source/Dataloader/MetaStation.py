@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import os
 from collections import Counter
 from pathlib import Path

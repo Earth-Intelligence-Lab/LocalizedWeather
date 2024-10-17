@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import torch
 from torch import nn as nn
 from torch_geometric.data import Data
@@ -127,7 +129,7 @@ class MPNN(nn.Module):
 
         madis_x = madis_x.view(n_batch, n_stations_m, -1)
 
-        in_graph = self.build_graph_internalbuild_graph_internal(madis_x, madis_lon, madis_lat, edge_index)
+        in_graph = self.build_graph_internal(madis_x, madis_lon, madis_lat, edge_index)
 
         u = in_graph.x
         in_pos = in_graph.pos

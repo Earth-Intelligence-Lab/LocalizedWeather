@@ -1,5 +1,5 @@
 # This file contains functions to evaluate model performance.
-# Author: Qidong Yang
+# Author: Qidong Yang & Jonathan Giezendanner
 # Date: 2024-02-14
 
 import numpy as np
@@ -51,6 +51,8 @@ def evaluate_model(model,
 
             madis_lon = sample[f'madis_lon'].to(device)
             madis_lat = sample[f'madis_lat'].to(device)
+
+            edge_index_m2m = sample[f'k_edge_index'].to(device)
 
             # normalize input
             madis_u = madis_norm_dict['u'].encode(madis_u)
@@ -107,6 +109,7 @@ def evaluate_model(model,
                 out = model(madis_x,
                             madis_lon,
                             madis_lat,
+                            edge_index_m2m,
                             era5_lon,
                             era5_lat,
                             era5_x,

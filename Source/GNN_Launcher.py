@@ -1,3 +1,5 @@
+# Author: Qidong Yang & Jonathan Giezendanner
+
 import json
 from pathlib import Path
 
@@ -18,14 +20,12 @@ args = AttrDict()
 model_name = 'MPNN'
 
 args.lead_hrs = 4
-args.n_neighbors_e2m = 0
+args.n_neighbors_e2m = 8
 
-args.output_saving_path = f'ModelOutputs/{model_name}_' + ''.join(
+args.output_saving_path = f'ModelOutputsTMP/{model_name}_' + ''.join(
     [f'_{k}={v.name if issubclass(type(v), Enum) else v}' for k, v in args.items()])
 
 ######### args after this are not included in path name
-
-args.static_node_image_size = 32
 
 args.coords = None
 args.shapefile_path = 'Shapefiles/Regions/northeastern_buffered.shp'
@@ -33,7 +33,7 @@ args.back_hrs = 48
 args.hidden_dim = 128
 args.lr = 1e-4
 args.epochs = 10
-args.batch_size = 64
+args.batch_size = 128
 args.weight_decay = 1e-4
 args.model_type = ModelType.GNN
 args.n_years = 5
@@ -49,10 +49,10 @@ for k in save_args.keys():
         save_args[k] = v.name
 
 args.eval_interval = 5
-args.root_path = '/Users/jonathangiezendanner/Documents/MIT/Projects/WindData/'
+args.root_path = '/Users/jonathangiezendanner/Documents/MIT/Projects/WindDataNE-US/'
 args.show_progress_bar = True
 
-outputPath = (Path(args.root_path).parent / 'ModelOutputs' / args.output_saving_path / 'params.json')
+outputPath = (Path(args.root_path).parent / args.output_saving_path / 'params.json')
 
 outputPath.parent.mkdir(exist_ok=True, parents=True)
 
