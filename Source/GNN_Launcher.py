@@ -22,7 +22,7 @@ model_name = 'MPNN'
 args.lead_hrs = 4
 args.n_neighbors_e2m = 8
 
-args.output_saving_path = f'ModelOutputsTMP/{model_name}_' + ''.join(
+args.output_saving_path = f'ModelOutputs/{model_name}_' + ''.join(
     [f'_{k}={v.name if issubclass(type(v), Enum) else v}' for k, v in args.items()])
 
 ######### args after this are not included in path name

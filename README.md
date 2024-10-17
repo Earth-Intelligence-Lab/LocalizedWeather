@@ -29,6 +29,9 @@ For MADIS and ERA5, the following variables are available:
 - dewpoint at 2 meters above ground
 - solar radiation
 
+The data can also be generated from scratch.
+For this, code is available under `Source/DataDownload/{ERA5/MADIS}` for the raw data download, and in the respective data loaders for the data processing (`Source/Dataloader/{ERA5/Madis}`).
+
 ## Code
 The code is organised as follows (in `Source/`):
 - `GNN_Launcher.py`, `GNN_NotebookLauncher.ipynb` and `GNN_SLURM_job_launcher.py` are three different launchers all eventually pointing at `GNN_Main.py` (the arguments from the slurm job launcher are parsed by `GNN_arg_parser.py`)
