@@ -1,6 +1,6 @@
 # Localized Weather GNN
 
-This repository contains the code and data for the paper "Multi-Modal Graph Neural Networks for Localized Off-Grid Weather Forecasting".
+This repository contains the code and data for the paper ["Multi-Modal Graph Neural Networks for Localized Off-Grid Weather Forecasting"](https://arxiv.org/abs/2410.12938).
 
 The paper presents a novel multi-modal graph neural network (GNN) that downscales gridded weather forecasts, such as ERA5, to provide accurate off-grid predictions. The model leverages both ERA5 data and local weather station observations from MADIS to make predictions that reflect both large-scale atmospheric dynamics and local weather patterns.
 
