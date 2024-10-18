@@ -15,7 +15,7 @@ Use the following citation when these data or model are used:
 # Model and data
 ## Data
 
-The data for training and inference can be found at [doi://](https://doi).
+The data for training, testing and validation can be found on [Zenodo](https://zenodo.org/records/13948611).
 
 The following data is available:
 - Shapefile of the Northeastern United States (NE-US, extracted from [NWS](https://www.weather.gov/gis/USStates))
