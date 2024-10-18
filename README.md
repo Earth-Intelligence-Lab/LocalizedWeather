@@ -8,7 +8,7 @@ The model is evaluated on a surface wind prediction task and shows significant i
 
 Use the following citation when these data or model are used:
 > Yang, Q.; Giezendanner, J.; Civitarese, D. S.; Jakubik, J.; 
-,Schmitt E.; Chandra, A.; Vila, J.; Hohl, D.; Hill, C.; Watson, C.; Wang, S.; Multi-modal graph neural networks for localized off-grid weather forecasting. arXiv, October 2024. https://arxiv.org/
+,Schmitt E.; Chandra, A.; Vila, J.; Hohl, D.; Hill, C.; Watson, C.; Wang, S.; Multi-modal graph neural networks for localized off-grid weather forecasting. arXiv, October 2024. https://doi.org/10.48550/arXiv.2410.12938
 
 
 
