@@ -24,11 +24,12 @@ from Modules.MLP.PlainMLP import PlainMLP
 from Network.ERA5Network import ERA5Network
 from Network.MadisNetwork import MadisNetwork
 from Settings.Settings import ModelType
+from Source.Modules.MLP.MPNN_MLP import MPNN_MLP
 
 
 def Run(args):
-    root_path = Path(args.root_path)
-    output_saving_path = root_path / args.output_saving_path
+    data_path = Path(args.data_path)
+    output_saving_path = data_path / args.output_saving_path
     output_saving_path.mkdir(exist_ok=True, parents=True)
     show_progress_bar = args.show_progress_bar
     shapefile_path = args.shapefile_path
@@ -36,7 +37,7 @@ def Run(args):
     if shapefile_path is None:
         lon_low, lon_up, lat_low, lat_up = args.coords
     else:
-        shapefile_path = root_path / shapefile_path
+        shapefile_path = data_path / shapefile_path
         lon_low, lat_low, lon_up, lat_up = gpd.read_file(shapefile_path).bounds.iloc[0].values
 
     back_hrs = args.back_hrs
@@ -75,14 +76,14 @@ def Run(args):
 
     ##### Load Data #####
     meta_station = MetaStation(lat_low, lat_up, lon_low, lon_up, n_years, madis_control_ratio,
-                               shapefile_path=shapefile_path, root_path=root_path)
+                               shapefile_path=shapefile_path, data_path=data_path)
 
     madis_network = MadisNetwork(meta_station, n_neighbors_m2m)
 
     if n_neighbors_e2m > 0:
         era5_stations = ERA5(meta_station.lat_low, meta_station.lat_up, meta_station.lon_low, meta_station.lon_up, 2023,
                              region='Northeastern',
-                             root_path=root_path).data
+                             data_path=data_path).data
 
         era5_network = ERA5Network(era5_stations, madis_network, n_neighbors_e2m)
     else:
@@ -93,13 +94,15 @@ def Run(args):
     # for dataset in ['train', 'val', 'test']:
     if model_type == ModelType.GNN:
         Data_List = [MixData(year, back_hrs, lead_hrs, meta_station, madis_network, n_neighbors_m2m, era5_network,
-                             root_path=root_path) for year in years]
+                             data_path=data_path) for year in years]
     else:
         Data_List = [MixDataMLP(year, back_hrs, lead_hrs, meta_station, madis_network, n_neighbors_m2m, era5_network,
-                                root_path=root_path) for year in years]
+                                data_path=data_path) for year in years]
 
         if era5_network is not None:
             era5_network.era5_pos = torch.Tensor(Data_List[0].madis_data[['lon', 'lat']].to_dataarray().values.T)
+            era5_network.era5_lons = torch.Tensor(Data_List[0].madis_data[['lon']].to_dataarray().values.T)
+            era5_network.era5_lats = torch.Tensor(Data_List[0].madis_data[['lat']].to_dataarray().values.T)
 
     n_dataset = dict()
 
@@ -130,6 +133,12 @@ def Run(args):
     if model_type == ModelType.MLP:
         model = PlainMLP(Madis_len,
                          ERA5_len if era5_network is not None else None,
+                         hidden_dim=hidden_dim).to(device)
+
+    if model_type == ModelType.MPNN_MLP:
+        model = MPNN_MLP(Madis_len,
+                         ERA5_len if era5_network is not None else None,
+                         2,
                          hidden_dim=hidden_dim).to(device)
 
     elif model_type == ModelType.GNN:

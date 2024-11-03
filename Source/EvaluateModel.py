@@ -88,7 +88,7 @@ def evaluate_model(model,
                 era5_x = torch.cat((era5_temp.unsqueeze(3), era5_u.unsqueeze(3), era5_v.unsqueeze(3)), dim=3)
 
                 b, s, t, v = era5_x.shape
-                era5_x = era5_x.view(b * s, t, v) if model_type == ModelType.MLP else era5_x.view(b, s, t * v)
+                era5_x = era5_x.view(b * s, t, v) if ((model_type == ModelType.MLP) or (model_type == ModelType.MPNN_MLP)) else era5_x.view(b, s, t * v)
 
             else:
                 era5_lon = None
@@ -103,6 +103,19 @@ def evaluate_model(model,
                 b, s, t, v = madis_x.shape
                 madis_x = madis_x.view(b * s, t, v)
                 out = model(madis_x, b, era5_x)
+                _, v = out.shape
+                out = out.view(b, s, v)
+            elif model_type == ModelType.MPNN_MLP:
+                b, s, t, v = madis_x.shape
+                madis_x = madis_x.view(b * s, t * v)
+                bs, t, v = era5_x.shape
+                era5_x = era5_x.view(bs, t * v)
+                madis_pos = torch.cat((madis_lon, madis_lat), dim=-1).view(b * s, 2)
+                era5_pos = torch.cat((era5_lon, era5_lat), dim=-1).view(b * s, 2)
+                out = model(madis_x,
+                            madis_pos,
+                            era5_x,
+                            era5_pos)
                 _, v = out.shape
                 out = out.view(b, s, v)
             else:

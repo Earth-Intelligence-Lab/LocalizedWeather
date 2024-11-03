@@ -6,12 +6,16 @@ from Settings.Settings import ModelType
 
 
 class SlurmJob(object):
-    def __init__(self, python_file, model_name, time='96:00:00', experiment_root='', **kwargs):
+    def __init__(self,
+                 model_name,
+                 python_file='/shared/home/jgiezend/LocalizedWeatherGNN/Source/GNN_arg_parser.py',
+                 data_path='/shared/home/jgiezend/data/WindDataNE-US/', experiment_root='', time='96:00:00', **kwargs):
 
         self.time = time
         self.kwargs = kwargs
 
         self.python_file = python_file
+        self.data_path = data_path
         self.job_name = model_name + ''.join([f'--{k}={v}' for k, v in self.kwargs.items()])
         self.job_name = self.job_name.replace('(', '_')
         self.job_name = self.job_name.replace(')', '_')
@@ -50,7 +54,7 @@ class SlurmJob(object):
     def command(self):
 
         part_1 = 'python '
-        part_2 = self.python_file + self.args
+        part_2 = self.python_file + self.args + f' --data_path={self.data_path}'
         part_3 = ' ' + f'--output_saving_path={self.output_path}'
 
         return part_1 + part_2 + part_3
@@ -106,18 +110,37 @@ class SlurmJob(object):
 
 
 def point_model():
-    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'MLP'
 
     model_type = ModelType.MLP.value
 
     lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
-    n_neighbors_e2ms = [0, 8]
+    n_neighbors_e2ms = [0, 1]
 
     for n_neighbors_e2m in n_neighbors_e2ms:
         for lead_hr in lead_hrs:
-            job = SlurmJob(python_file, model_name,
-                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
+            job = SlurmJob(model_name,
+                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps_release/{model_name}',
+                           epochs=200,
+                           lead_hrs=lead_hr,
+                           n_neighbors_e2m=n_neighbors_e2m,
+                           model_type=model_type,
+                           shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
+            job.launch()
+
+
+def point_modelMPNN_MLP():
+    model_name = 'MPNN_MLP'
+
+    model_type = ModelType.MPNN_MLP.value
+
+    lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
+    n_neighbors_e2ms = [1]
+
+    for n_neighbors_e2m in n_neighbors_e2ms:
+        for lead_hr in lead_hrs:
+            job = SlurmJob(model_name,
+                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps_release/{model_name}',
                            epochs=200,
                            lead_hrs=lead_hr,
                            n_neighbors_e2m=n_neighbors_e2m,
@@ -127,7 +150,6 @@ def point_model():
 
 
 def graph_model():
-    python_file = '/shared/home/jgiezend/wind_obs_correction/GNN_arg_parser.py'
     model_name = 'GNN'
 
     model_type = ModelType.GNN.value
@@ -137,8 +159,8 @@ def graph_model():
 
     for n_neighbors_e2m in n_neighbors_e2ms:
         for lead_hr in lead_hrs:
-            job = SlurmJob(python_file, model_name,
-                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps/{model_name}',
+            job = SlurmJob(model_name,
+                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps_release/{model_name}',
                            epochs=200,
                            lead_hrs=lead_hr,
                            n_neighbors_e2m=n_neighbors_e2m,
@@ -150,3 +172,4 @@ def graph_model():
 if __name__ == '__main__':
     point_model()
     graph_model()
+    point_modelMPNN_MLP()

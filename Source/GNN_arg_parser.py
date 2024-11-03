@@ -39,7 +39,7 @@ parser.add_argument('--eval_interval', default=5, type=int)
 parser.add_argument('--show_progress_bar', default=False, type=bool)
 
 # file systems
-parser.add_argument('--root_path', default='/shared/home/jgiezend/data/WindData/', type=str)
+parser.add_argument('--data_path', default='/shared/home/jgiezend/data/WindData/', type=str)
 parser.add_argument('--output_saving_path', default='tmp', type=str)
 
 ## process args

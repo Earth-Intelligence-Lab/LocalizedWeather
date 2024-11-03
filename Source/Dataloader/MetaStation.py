@@ -12,7 +12,7 @@ from shapely import points
 
 class MetaStation(object):
     def __init__(self, lat_low, lat_up, lon_low, lon_up, n_years=5, control_ratio=0.9, shapefile_path=None,
-                 root_path=Path('')):
+                 data_path=Path('')):
 
         self.lat_low = lat_low
         self.lat_up = lat_up
@@ -21,17 +21,17 @@ class MetaStation(object):
         self.n_years = n_years
         self.control_ratio = control_ratio
         self.start_year = 2023 - n_years + 1
-        self.root_path = root_path
+        self.data_path = data_path
         self.file_name = '%.2f_%.2f_%.2f_%.2f' % (self.lon_low, self.lon_up, self.lat_low, self.lat_up)
         self.shapefile_path = shapefile_path
         if self.shapefile_path is not None:
             self.file_name += self.shapefile_path.stem
         self.filtered_file_name = self.file_name + f'_filtered_{self.control_ratio}'
 
-        self.all_station_file = root_path / (f'madis/stations/stations_{self.start_year}_2023_{self.file_name}.shp')
-        self.station_file = root_path / (
+        self.all_station_file = data_path / (f'madis/stations/stations_{self.start_year}_2023_{self.file_name}.shp')
+        self.station_file = data_path / (
             f'madis/stations/stations_{self.start_year}_2023_{self.filtered_file_name}.shp')
-        self.data_dir = lambda year, month: root_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
+        self.data_dir = lambda year, month: data_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
 
         Path(self.all_station_file).parent.mkdir(exist_ok=True, parents=True)
 

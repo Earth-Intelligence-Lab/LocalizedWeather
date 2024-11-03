@@ -16,7 +16,7 @@ from Source.Normalization.Normalizers import MinMaxNormalizer
 
 class MixData(Dataset):
     def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network,
-                 root_path=Path('')):
+                 data_path=Path('')):
         # meta_station: MetaStation object
 
         self.year = year
@@ -28,7 +28,7 @@ class MixData(Dataset):
         self.era5_network = era5_network
         if self.era5_network is not None:
             self.ERA5 = ERA5(meta_station.lat_low, meta_station.lat_up, meta_station.lon_low, meta_station.lon_up,
-                             self.year, root_path=root_path)
+                             self.year, data_path=data_path)
             self.era5_data = self.ERA5.data
 
         self.time_line = pd.to_datetime(pd.Series(list(
@@ -45,7 +45,7 @@ class MixData(Dataset):
 
         self.Madis = Madis(self.time_line, stat_coords_raw, self.stat_coords, meta_station.lat_low, meta_station.lat_up,
                            meta_station.lon_low, meta_station.lon_up, meta_station.file_name,
-                           meta_station.filtered_file_name, meta_station.n_years, root_path=root_path)
+                           meta_station.filtered_file_name, meta_station.n_years, data_path=data_path)
         self.madis_data = self.Madis.ds_xr
 
         self.madis_u_min = np.min(self.madis_data.u.values)
