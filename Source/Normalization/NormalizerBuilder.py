@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from Source.Normalization.Normalizers import MinMaxNormalizer, ABNormalizer
+from Normalization.Normalizers import MinMaxNormalizer, ABNormalizer
 
 
 def get_normalizers(Data_List, era5_network):

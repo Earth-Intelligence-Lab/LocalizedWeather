@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from Settings.Settings import *
-from Source import GNN_Main
+import GNN_Main
 
 
 class AttrDict(dict):

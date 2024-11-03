@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from Source.Dataloader.MixData import MixData
-from Source.Settings.Settings import MLPERA5InterpolationType
+from Dataloader.MixData import MixData
+from Settings.Settings import MLPERA5InterpolationType
 
 
 class MixDataMLP(MixData):

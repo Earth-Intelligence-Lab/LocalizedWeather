@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 from torch import nn
 from torch.utils.data import DataLoader, ConcatDataset
 
-import Source.Normalization.NormalizerBuilder as NormalizerBuilder
+import Normalization.NormalizerBuilder as NormalizerBuilder
 from Dataloader.ERA5 import ERA5
 from Dataloader.MetaStation import MetaStation
 from Dataloader.MixData import MixData
@@ -24,7 +24,7 @@ from Modules.MLP.PlainMLP import PlainMLP
 from Network.ERA5Network import ERA5Network
 from Network.MadisNetwork import MadisNetwork
 from Settings.Settings import ModelType
-from Source.Modules.MLP.MPNN_MLP import MPNN_MLP
+from Modules.MLP.MPNN_MLP import MPNN_MLP
 
 
 def Run(args):

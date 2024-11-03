@@ -1,7 +1,7 @@
 import torch
 from torch import nn as nn
 
-from Source.Modules.Activations import Tanh
+from Modules.Activations import Tanh
 
 
 class MPNN_MLP(nn.Module):

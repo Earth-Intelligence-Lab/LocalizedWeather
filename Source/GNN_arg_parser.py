@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 
 from Settings.Settings import ModelType
-from Source import GNN_Main
+import GNN_Main
 
 #### Configuration #####
 parser = argparse.ArgumentParser()

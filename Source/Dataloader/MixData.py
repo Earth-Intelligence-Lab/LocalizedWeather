@@ -9,9 +9,9 @@ import torch
 from dateutil import rrule
 from torch.utils.data import Dataset
 
-from Source.Dataloader.ERA5 import ERA5
-from Source.Dataloader.Madis import Madis
-from Source.Normalization.Normalizers import MinMaxNormalizer
+from Dataloader.ERA5 import ERA5
+from Dataloader.Madis import Madis
+from Normalization.Normalizers import MinMaxNormalizer
 
 
 class MixData(Dataset):

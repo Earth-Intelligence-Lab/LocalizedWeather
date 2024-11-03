@@ -4,9 +4,9 @@ import torch
 from torch import nn as nn
 from torch_geometric.data import Data
 
-from Source.Modules.Activations import Tanh
-from Source.Modules.GNN.GNN_Layer_External import GNN_Layer_External
-from Source.Modules.GNN.GNN_Layer_Internal import GNN_Layer_Internal
+from Modules.Activations import Tanh
+from Modules.GNN.GNN_Layer_External import GNN_Layer_External
+from Modules.GNN.GNN_Layer_Internal import GNN_Layer_Internal
 
 
 class MPNN(nn.Module):
