@@ -115,7 +115,7 @@ def point_model():
     model_type = ModelType.MLP.value
 
     lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
-    n_neighbors_e2ms = [0, 1]
+    n_neighbors_e2ms = [1]
 
     for n_neighbors_e2m in n_neighbors_e2ms:
         for lead_hr in lead_hrs:
@@ -171,5 +171,5 @@ def graph_model():
 
 if __name__ == '__main__':
     point_model()
-    graph_model()
-    point_modelMPNN_MLP()
+    # graph_model()
+    # point_modelMPNN_MLP()

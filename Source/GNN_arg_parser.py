@@ -30,7 +30,7 @@ parser.add_argument('--n_years', default=5, type=int)
 parser.add_argument('--hidden_dim', default=128, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
 parser.add_argument('--epochs', default=200, type=int)
-parser.add_argument('--batch_size', default=256, type=int)
+parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--weight_decay', default=1e-4, type=float)
 parser.add_argument('--n_passing', default=4, type=int)
 

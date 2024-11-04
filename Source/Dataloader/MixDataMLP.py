@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
 import xarray as xr
 
 from Dataloader.MixData import MixData
@@ -101,7 +102,14 @@ class MixDataMLP(MixData):
                      'lat': 'era5_lats'}))
 
                 interpolated_file_path.parent.mkdir(exist_ok=True, parents=True)
-                # data.to_netcdf(interpolated_file_path)
+                data.to_netcdf(interpolated_file_path)
 
                 self.era5_data = data
                 return
+
+    def getERA5Sample(self, time_sel):
+        era5_u = torch.from_numpy(self.era5_data.u10.sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32))
+        era5_v = torch.from_numpy(self.era5_data.v10.sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32))
+        era5_temp = torch.from_numpy(self.era5_data.t2m.sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32))
+
+        return era5_u, era5_v, era5_temp

@@ -108,15 +108,7 @@ class MixData(Dataset):
         }
 
         if self.era5_network is not None:
-            era5_u = torch.from_numpy(
-                np.moveaxis(self.era5_data.u10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
-                    (self.era5_network.era5_pos.size(0), -1)).astype(np.float32))
-            era5_v = torch.from_numpy(
-                np.moveaxis(self.era5_data.v10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
-                    (self.era5_network.era5_pos.size(0), -1)).astype(np.float32))
-            era5_temp = torch.from_numpy(
-                np.moveaxis(self.era5_data.t2m.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
-                    (self.era5_network.era5_pos.size(0), -1)).astype(np.float32))
+            era5_u, era5_v, era5_temp = self.getERA5Sample(time_sel)
 
             sample[f'e2m_edge_index'] = self.era5_network.e2m_edge_index
             sample[f'era5_u'] = era5_u
@@ -126,3 +118,16 @@ class MixData(Dataset):
             sample[f'era5_lat'] = self.lat_normalizer.encode(self.era5_network.era5_lats)
 
         return sample
+
+    def getERA5Sample(self, time_sel):
+        era5_u = torch.from_numpy(
+            np.moveaxis(self.era5_data.u10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
+                (self.era5_network.era5_pos.size(0), -1)).astype(np.float32))
+        era5_v = torch.from_numpy(
+            np.moveaxis(self.era5_data.v10.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
+                (self.era5_network.era5_pos.size(0), -1)).astype(np.float32))
+        era5_temp = torch.from_numpy(
+            np.moveaxis(self.era5_data.t2m.sel(time=slice(time_sel[0], time_sel[-1])).values, 0, -1).reshape(
+                (self.era5_network.era5_pos.size(0), -1)).astype(np.float32))
+
+        return era5_u, era5_v, era5_temp

@@ -135,7 +135,7 @@ def Run(args):
                          ERA5_len if era5_network is not None else None,
                          hidden_dim=hidden_dim).to(device)
 
-    if model_type == ModelType.MPNN_MLP:
+    elif model_type == ModelType.MPNN_MLP:
         model = MPNN_MLP(Madis_len,
                          ERA5_len if era5_network is not None else None,
                          2,
