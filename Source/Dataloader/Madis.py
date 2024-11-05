@@ -13,7 +13,7 @@ from shapely import points
 class Madis(object):
     def __init__(self, times, coords_raw, coords, lat_low, lat_up, lon_low, lon_up, file_name, filtered_file_name,
                  n_years=5,
-                 root_path=Path('')):
+                 data_path=Path('')):
 
         # n_years comes from meta station
 
@@ -37,11 +37,11 @@ class Madis(object):
         self.lons_raw = np.array([i.x for i in self.coords_raw])
         self.lats_raw = np.array([i.y for i in self.coords_raw])
 
-        self.root_path = root_path
+        self.data_path = data_path
 
         meta_year_cover = f'Meta--{2024 - self.n_years}--2023'
-        meta_year_folder = self.root_path / f'madis/processed/{meta_year_cover}'
-        # meta_year_folder = self.root_path/f'madis/SyntheticERA5/{meta_year_cover}'
+        meta_year_folder = self.data_path / f'madis/processed/{meta_year_cover}'
+        # meta_year_folder = self.data_path/f'madis/SyntheticERA5/{meta_year_cover}'
         madis_raw_filename = f'madis_{self.years[0]}_{file_name}.nc'
         madis_filename = f'madis_{self.years[0]}_{filtered_file_name}.nc'
 
@@ -122,7 +122,7 @@ class Madis(object):
         return madis_ds
 
     def load_madis_monthly(self, year, month):
-        data_path = self.root_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
+        data_path = self.data_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
 
         data = xr.open_dataset(data_path)
 

@@ -30,11 +30,11 @@ class PlainMLP(nn.Module):
             nn.Linear(self.in_merge_dim // 4, 2)
         )
 
-    def forward(self, madis_x, batch, era5_x=None, static_nodes_stations_logical=None, static_nodes_recompute=None):
+    def forward(self, madis_x, batch, era5_x=None):
 
-        # madis_u: (n_batch, n_stations, Madis_len)
-        # madis_v: (n_batch, n_stations, Madis_len)
-        # madis_temp: (n_batch, n_stations, Madis_len)
+        # madis_u: (n_batch * n_stations, Madis_len)
+        # madis_v: (n_batch * n_stations, Madis_len)
+        # madis_temp: (n_batch * n_stations, Madis_len)
 
         madis_u_emb = self.linear_u(madis_x[:, :, 0])
         madis_v_emb = self.linear_v(madis_x[:, :, 1])

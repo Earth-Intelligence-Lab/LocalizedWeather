@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 
 from Settings.Settings import ModelType
-from Source import GNN_Main
+import GNN_Main
 
 #### Configuration #####
 parser = argparse.ArgumentParser()
@@ -30,7 +30,7 @@ parser.add_argument('--n_years', default=5, type=int)
 parser.add_argument('--hidden_dim', default=128, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
 parser.add_argument('--epochs', default=200, type=int)
-parser.add_argument('--batch_size', default=256, type=int)
+parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--weight_decay', default=1e-4, type=float)
 parser.add_argument('--n_passing', default=4, type=int)
 
@@ -39,7 +39,7 @@ parser.add_argument('--eval_interval', default=5, type=int)
 parser.add_argument('--show_progress_bar', default=False, type=bool)
 
 # file systems
-parser.add_argument('--root_path', default='/shared/home/jgiezend/data/WindData/', type=str)
+parser.add_argument('--data_path', default='/shared/home/jgiezend/data/WindData/', type=str)
 parser.add_argument('--output_saving_path', default='tmp', type=str)
 
 ## process args
