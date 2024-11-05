@@ -17,10 +17,10 @@ class AttrDict(dict):
 
 args = AttrDict()
 
-model_name = 'test'
+model_name = 'testDel'
 
 args.lead_hrs = 16
-args.n_neighbors_e2m = 1
+args.n_neighbors_e2m = 0
 
 args.output_saving_path = f'ModelOutputs/{model_name}_' + ''.join(
     [f'_{k}={v.name if issubclass(type(v), Enum) else v}' for k, v in args.items()])
@@ -35,10 +35,11 @@ args.lr = 1e-4
 args.epochs = 50
 args.batch_size = 64
 args.weight_decay = 1e-4
-args.model_type = ModelType.MPNN_MLP
+args.model_type = ModelType.GNN
+args.network_construction_method = NetworkConstructionMethod.DELAUNAY
 args.n_years = 5
 args.madis_control_ratio = .9
-args.n_passing = 0
+args.n_passing = 5
 args.n_neighbors_m2m = 5
 
 save_args = args.copy()

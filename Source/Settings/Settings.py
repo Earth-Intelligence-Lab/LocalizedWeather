@@ -9,3 +9,7 @@ class ModelType(Enum):
 class MLPERA5InterpolationType(Enum):
     Nearest = 0
     Linear = 1
+
+class NetworkConstructionMethod(Enum):
+    KNN = 1
+    DELAUNAY = 2

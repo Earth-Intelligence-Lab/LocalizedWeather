@@ -57,6 +57,7 @@ def Run(args):
     n_years = args.n_years
     n_passing = args.n_passing
     n_neighbors_m2m = args.n_neighbors_m2m
+    network_construction_method = args.network_construction_method
 
     n_neighbors_e2m = args.n_neighbors_e2m
 
@@ -78,7 +79,7 @@ def Run(args):
     meta_station = MetaStation(lat_low, lat_up, lon_low, lon_up, n_years, madis_control_ratio,
                                shapefile_path=shapefile_path, data_path=data_path)
 
-    madis_network = MadisNetwork(meta_station, n_neighbors_m2m)
+    madis_network = MadisNetwork(meta_station, n_neighbors_m2m, network_construction_method)
 
     if n_neighbors_e2m > 0:
         era5_stations = ERA5(meta_station.lat_low, meta_station.lat_up, meta_station.lon_low, meta_station.lon_up, 2023,

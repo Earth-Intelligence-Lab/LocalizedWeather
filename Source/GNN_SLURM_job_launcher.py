@@ -2,7 +2,7 @@
 
 import os
 
-from Settings.Settings import ModelType
+from Settings.Settings import ModelType, NetworkConstructionMethod
 
 
 class SlurmJob(object):
@@ -169,7 +169,29 @@ def graph_model():
             job.launch()
 
 
+def graph_model_delaunay():
+    model_name = 'GNN_DELAUNAY'
+
+    model_type = ModelType.GNN.value
+
+    lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
+    n_neighbors_e2ms = [0, 8]
+
+    for n_neighbors_e2m in n_neighbors_e2ms:
+        for lead_hr in lead_hrs:
+            job = SlurmJob(model_name,
+                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps_release/{model_name}',
+                           epochs=200,
+                           lead_hrs=lead_hr,
+                           n_neighbors_e2m=n_neighbors_e2m,
+                           network_construction_method=NetworkConstructionMethod.DELAUNAY.value,
+                           model_type=model_type,
+                           shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
+            job.launch()
+
+
 if __name__ == '__main__':
-    point_model()
+    # point_model()
     # graph_model()
     # point_modelMPNN_MLP()
+    graph_model_delaunay()

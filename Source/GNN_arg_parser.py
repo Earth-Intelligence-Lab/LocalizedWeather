@@ -5,7 +5,7 @@ import json
 from enum import Enum
 from pathlib import Path
 
-from Settings.Settings import ModelType
+from Settings.Settings import ModelType, NetworkConstructionMethod
 import GNN_Main
 
 #### Configuration #####
@@ -13,6 +13,9 @@ parser = argparse.ArgumentParser()
 
 ## Model
 parser.add_argument('--model_type', default=ModelType.GNN.value, type=int)
+
+## Graph
+parser.add_argument('--network_construction_method', default=NetworkConstructionMethod.KNN.value, type=int)
 
 ## Dataset
 parser.add_argument('--coords', default=(-74, -70, 41, 43), type=float, nargs='+')
@@ -46,6 +49,8 @@ parser.add_argument('--output_saving_path', default='tmp', type=str)
 args = parser.parse_args()
 
 args.model_type = ModelType(args.model_type)
+args.network_construction_method = NetworkConstructionMethod(args.network_construction_method)
+
 save_args = vars(args).copy()
 
 for k in save_args.keys():
