@@ -268,19 +268,19 @@ def Run(args):
                 np.save(os.path.join(output_saving_path, f'min_test_u_mse.npy'), test_u_mse)
                 np.save(os.path.join(output_saving_path, f'min_test_v_mse.npy'), test_v_mse)
 
-            print('Evaluation Report: test_u_mae[%.3f] test_u_mse[%.3f] test_v_mae[%.3f] test_v_mse[%.3f]' % (
-                test_u_mae, test_u_mse, test_v_mae, test_v_mse), flush=True)
+            print('Evaluation Report: test_mse[%.3f] test_u_mae[%.3f] test_u_mse[%.3f] test_v_mae[%.3f] test_v_mse[%.3f]' % (
+                test_loss, test_u_mae, test_u_mse, test_v_mae, test_v_mse), flush=True)
             print(' ', flush=True)
 
-            np.save(os.path.join(output_saving_path, f'station_train_test_u_mae_epoch_{epoch + 1}.npy'),
-                    MAE_u_sum / n_dataset['test'])
-            np.save(os.path.join(output_saving_path, f'station_train_test_u_mse_epoch_{epoch + 1}.npy'),
-                    MSE_u_sum / n_dataset['test'])
-            np.save(os.path.join(output_saving_path, f'station_train_test_v_mae_epoch_{epoch + 1}.npy'),
-                    MAE_v_sum / n_dataset['test'])
-            np.save(os.path.join(output_saving_path, f'station_train_test_v_mse_epoch_{epoch + 1}.npy'),
-                    MSE_v_sum / n_dataset['test'])
-            np.save(os.path.join(output_saving_path, f'station_train_test_preds_epoch_{epoch + 1}.npy'), Pred)
+            # np.save(os.path.join(output_saving_path, f'station_train_test_u_mae_epoch_{epoch + 1}.npy'),
+            #         MAE_u_sum / n_dataset['test'])
+            # np.save(os.path.join(output_saving_path, f'station_train_test_u_mse_epoch_{epoch + 1}.npy'),
+            #         MSE_u_sum / n_dataset['test'])
+            # np.save(os.path.join(output_saving_path, f'station_train_test_v_mae_epoch_{epoch + 1}.npy'),
+            #         MAE_v_sum / n_dataset['test'])
+            # np.save(os.path.join(output_saving_path, f'station_train_test_v_mse_epoch_{epoch + 1}.npy'),
+            #         MSE_v_sum / n_dataset['test'])
+            # np.save(os.path.join(output_saving_path, f'station_train_test_preds_epoch_{epoch + 1}.npy'), Pred)
 
             torch.save(model.state_dict(), os.path.join(output_saving_path, f'model_epoch_{epoch + 1}.pt'))
 
