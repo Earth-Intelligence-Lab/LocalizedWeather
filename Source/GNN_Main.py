@@ -20,10 +20,11 @@ from Dataloader.MixData import MixData
 from Dataloader.MixDataMLP import MixDataMLP
 from EvaluateModel import evaluate_model
 from Modules.GNN.MPNN import MPNN
+from Modules.LossFunctions import wind_loss
 from Modules.MLP.PlainMLP import PlainMLP
 from Network.ERA5Network import ERA5Network
 from Network.MadisNetwork import MadisNetwork
-from Settings.Settings import ModelType
+from Settings.Settings import ModelType, LossFunctionType
 from Modules.MLP.MPNN_MLP import MPNN_MLP
 
 
@@ -48,6 +49,8 @@ def Run(args):
     ERA5_len = whole_len + lead_hrs
     hidden_dim = args.hidden_dim
     lr = args.lr
+    loss_function_type = args.loss_function_type
+    # loss_function_type = LossFunctionType.WIND_VECTOR
     epochs = args.epochs
     batch_size = args.batch_size
     eval_interval = args.eval_interval
@@ -160,7 +163,10 @@ def Run(args):
     print('Parameter Number: ', nn_params, flush=True)
     print(' ', flush=True)
 
-    loss_function = nn.MSELoss(reduction='sum')
+    if loss_function_type == LossFunctionType.MSE:
+        loss_function = nn.MSELoss(reduction='sum')
+    elif loss_function_type == LossFunctionType.WIND_VECTOR:
+        loss_function = wind_loss
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
@@ -174,6 +180,8 @@ def Run(args):
     test_v_maes = []
 
     min_valid_loss = 9999999999
+    min_valid_loss_wind_vector = 9999999999
+    min_valid_loss_mae = 9999999999
 
     for epoch in range(epochs):
         test_epoch = (epoch + 1) % eval_interval == 0 or epoch == 0
@@ -239,34 +247,11 @@ def Run(args):
             test_v_mses.append(test_v_mse)
 
             test_loss = (MSE_u_sum + MSE_v_sum) / (n_dataset['test'] * n_test_stations)
-            test_loss_mae = (MAE_u_sum + MAE_v_sum) / (n_dataset['test'] * n_test_stations)
             test_losses.append(test_loss)
 
-            # if (epoch + 1) == epochs:
-            if valid_loss < min_valid_loss:
-                min_valid_loss = valid_loss
-
-                serialized_data = pickle.dumps(madis_network)
-                # Step 4: Write the serialized data to a file
-                with open(output_saving_path / f'madis_network_min.pkl', 'wb') as file:
-                    file.write(serialized_data)
-
-                serialized_data = pickle.dumps(Targets)
-                # Step 4: Write the serialized data to a file
-                with open(output_saving_path / f'Targets_min.pkl', 'wb') as file:
-                    file.write(serialized_data)
-
-                serialized_data = pickle.dumps(Preds)
-                # Step 4: Write the serialized data to a file
-                with open(output_saving_path / f'Preds_min.pkl', 'wb') as file:
-                    file.write(serialized_data)
-
-                np.save(os.path.join(output_saving_path, f'min_test_loss_mse.npy'), test_loss)
-                np.save(os.path.join(output_saving_path, f'min_test_loss_mae.npy'), test_loss_mae)
-                np.save(os.path.join(output_saving_path, f'min_test_u_mae.npy'), test_u_mae)
-                np.save(os.path.join(output_saving_path, f'min_test_v_mae.npy'), test_v_mae)
-                np.save(os.path.join(output_saving_path, f'min_test_u_mse.npy'), test_u_mse)
-                np.save(os.path.join(output_saving_path, f'min_test_v_mse.npy'), test_v_mse)
+            min_valid_loss = SaveState(Preds, Targets, madis_network, min_valid_loss, output_saving_path, 'MSE')
+            min_valid_loss_mae = SaveState(Preds, Targets, madis_network, min_valid_loss_mae, output_saving_path, 'MAE')
+            min_valid_loss_wind_vector = SaveState(Preds, Targets, madis_network, min_valid_loss_wind_vector, output_saving_path, 'wind_vector')
 
             print('Evaluation Report: test_mse[%.3f] test_u_mae[%.3f] test_u_mse[%.3f] test_v_mae[%.3f] test_v_mse[%.3f]' % (
                 test_loss, test_u_mae, test_u_mse, test_v_mae, test_v_mse), flush=True)
@@ -305,6 +290,39 @@ def Run(args):
 
     ##### Plotting #####
     plot_metric(train_losses, valid_losses, test_losses, eval_interval, 'MSE', figures_path)
+
+
+def SaveState(Preds, Targets, madis_network, min_valid_loss, output_saving_path, metric):
+
+    u_error = Preds['val'][..., 0] - Targets['val'][..., 0]
+    v_error = Preds['val'][..., 1] - Targets['val'][..., 1]
+    if metric == 'wind_vector':
+        valid_loss = np.mean(np.sqrt(u_error**2 + v_error**2))
+    elif metric == 'MSE':
+        valid_loss = np.mean(u_error**2 + v_error**2)
+    elif metric == 'MAE':
+        valid_loss = np.mean(np.abs(u_error) + np.abs(v_error))
+
+
+    if valid_loss >= min_valid_loss:
+        return min_valid_loss
+
+    serialized_data = pickle.dumps(madis_network)
+    # Step 4: Write the serialized data to a file
+    with open(output_saving_path / f'madis_network_{metric}_min.pkl', 'wb') as file:
+        file.write(serialized_data)
+
+    serialized_data = pickle.dumps(Targets)
+    # Step 4: Write the serialized data to a file
+    with open(output_saving_path / f'Targets_{metric}_min.pkl', 'wb') as file:
+        file.write(serialized_data)
+
+    serialized_data = pickle.dumps(Preds)
+    # Step 4: Write the serialized data to a file
+    with open(output_saving_path / f'Preds_{metric}_min.pkl', 'wb') as file:
+        file.write(serialized_data)
+
+    return valid_loss
 
 
 def plot_metric(train_losses, valid_losses, test_losses, eval_interval, metric_name, output_path, y_range=None):

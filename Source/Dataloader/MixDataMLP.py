@@ -13,7 +13,7 @@ from Settings.Settings import MLPERA5InterpolationType
 
 class MixDataMLP(MixData):
     def __init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m,
-                 era5_network, interpolation_type=MLPERA5InterpolationType.Nearest, data_path=Path('')):
+                 era5_network, interpolation_type=MLPERA5InterpolationType.Linear, data_path=Path('')):
         MixData.__init__(self, year, back_hrs, lead_hours, meta_station, madis_network, n_neighbors_m2m, era5_network,
                          data_path)
 

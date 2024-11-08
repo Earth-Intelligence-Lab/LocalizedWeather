@@ -13,3 +13,7 @@ class MLPERA5InterpolationType(Enum):
 class NetworkConstructionMethod(Enum):
     KNN = 1
     DELAUNAY = 2
+
+class LossFunctionType(Enum):
+    MSE = 0
+    WIND_VECTOR = 1

@@ -115,7 +115,7 @@ def point_model():
     model_type = ModelType.MLP.value
 
     lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
-    n_neighbors_e2ms = [1]
+    n_neighbors_e2ms = [0, 8]
 
     for n_neighbors_e2m in n_neighbors_e2ms:
         for lead_hr in lead_hrs:
@@ -150,7 +150,7 @@ def point_modelMPNN_MLP():
 
 
 def graph_model():
-    model_name = 'GNN'
+    model_name = 'GNN_wind'
 
     model_type = ModelType.GNN.value
 
@@ -164,6 +164,28 @@ def graph_model():
                            epochs=200,
                            lead_hrs=lead_hr,
                            n_neighbors_e2m=n_neighbors_e2m,
+                           model_type=model_type,
+                           shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
+            job.launch()
+
+
+def graph_modelMLP():
+    model_name = 'MLPMPNN_wind'
+
+    model_type = ModelType.GNN.value
+
+    lead_hrs = [1, 2, 4, 8, 16, 24, 36, 48]
+    n_neighbors_e2ms = [0, 1]
+
+    for n_neighbors_e2m in n_neighbors_e2ms:
+        for lead_hr in lead_hrs:
+            job = SlurmJob(model_name,
+                           experiment_root=f'/shared/home/jgiezend/wind_obs_exps_release/{model_name}',
+                           epochs=200,
+                           lead_hrs=lead_hr,
+                           n_neighbors_e2m=n_neighbors_e2m,
+                           n_neighbors_m2m=0,
+                           n_passing=0,
                            model_type=model_type,
                            shapefile_path='Shapefiles/Regions/northeastern_buffered.shp')
             job.launch()
@@ -192,6 +214,7 @@ def graph_model_delaunay():
 
 if __name__ == '__main__':
     # point_model()
-    # graph_model()
+    graph_modelMLP()
+    graph_model()
     # point_modelMPNN_MLP()
-    graph_model_delaunay()
+    # graph_model_delaunay()

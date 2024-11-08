@@ -5,7 +5,7 @@ import json
 from enum import Enum
 from pathlib import Path
 
-from Settings.Settings import ModelType, NetworkConstructionMethod
+from Settings.Settings import ModelType, NetworkConstructionMethod, LossFunctionType
 import GNN_Main
 
 #### Configuration #####
@@ -32,6 +32,7 @@ parser.add_argument('--n_years', default=5, type=int)
 # Model Hyperparameters
 parser.add_argument('--hidden_dim', default=128, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
+parser.add_argument('--loss_function_type', default=LossFunctionType.WIND_VECTOR.value, type=int)
 parser.add_argument('--epochs', default=200, type=int)
 parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--weight_decay', default=1e-4, type=float)
@@ -50,6 +51,7 @@ args = parser.parse_args()
 
 args.model_type = ModelType(args.model_type)
 args.network_construction_method = NetworkConstructionMethod(args.network_construction_method)
+args.loss_function_type = LossFunctionType(args.loss_function_type)
 
 save_args = vars(args).copy()
 
