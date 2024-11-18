@@ -304,7 +304,7 @@ def SaveState(Preds, Targets, madis_network, min_valid_loss, output_saving_path,
         valid_loss = np.mean(np.abs(u_error) + np.abs(v_error))
 
 
-    if valid_loss >= min_valid_loss:
+    if (valid_loss >= min_valid_loss) or (np.isnan(valid_loss)):
         return min_valid_loss
 
     serialized_data = pickle.dumps(madis_network)
