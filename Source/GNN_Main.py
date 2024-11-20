@@ -19,6 +19,7 @@ from Dataloader.MetaStation import MetaStation
 from Dataloader.MixData import MixData
 from Dataloader.MixDataMLP import MixDataMLP
 from EvaluateModel import evaluate_model
+from Figures.StationsSetup import PlotStations
 from Modules.GNN.MPNN import MPNN
 from Modules.LossFunctions import wind_loss
 from Modules.MLP.PlainMLP import PlainMLP
@@ -76,7 +77,7 @@ def Run(args):
     np.random.seed(100)
 
     ##### Get Device #####
-    device = 'cuda:0' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
+    device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
 
     ##### Load Data #####
     meta_station = MetaStation(lat_low, lat_up, lon_low, lon_up, n_years, madis_control_ratio,
@@ -92,6 +93,8 @@ def Run(args):
         era5_network = ERA5Network(era5_stations, madis_network, n_neighbors_e2m)
     else:
         era5_network = None
+
+    PlotStations(madis_network, era5_network, figures_path)
 
     years = list(range(2024 - n_years, 2024))
 
@@ -157,6 +160,9 @@ def Run(args):
 
     else:
         raise NotImplementedError
+
+    if torch.cuda.is_available() and torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model)
 
     nn_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
