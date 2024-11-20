@@ -88,7 +88,7 @@ def __PlotStations(
 
             norm = np.array([dx, dy]) / np.sqrt(dx ** 2 + dy ** 2)
 
-            offset = norm * .05
+            offset = norm * .18
 
             dx = dx - 2 * offset[0]
             dy = dy - 2 * offset[1]
