@@ -1,13 +1,10 @@
-import xarray as xr
-import numpy as np
-import matplotlib.pyplot as plt
-
-from herbie import Herbie
 from datetime import datetime, timedelta
+
+import xarray as xr
+from herbie import Herbie
 
 
 def downloader_hourly(run_time, var_list, lat_min, lat_max, lon_min, lon_max, max_lead_hr=18):
-
     # run_time: time string like "2019-07-19 15:00"
     # var_list: variable list string like "(?:TMP:2 m|:UGRD:10 m)"
 
@@ -23,9 +20,11 @@ def downloader_hourly(run_time, var_list, lat_min, lat_max, lon_min, lon_max, ma
             dss_new = []
 
             for ds in dss:
-                ds = ds.drop_vars([coord for coord in ds.coords if coord not in ['latitude', 'longitude', 'time', 'step']])
+                ds = ds.drop_vars(
+                    [coord for coord in ds.coords if coord not in ['latitude', 'longitude', 'time', 'step']])
 
-                location_msk = (ds.latitude >= lat_min) & (ds.latitude <= lat_max) & (ds.longitude >= lon_min) & (ds.longitude <= lon_max)
+                location_msk = (ds.latitude >= lat_min) & (ds.latitude <= lat_max) & (ds.longitude >= lon_min) & (
+                            ds.longitude <= lon_max)
                 ds = ds.where(location_msk, drop=True)
 
                 dss_new.append(ds)
@@ -40,14 +39,12 @@ def downloader_hourly(run_time, var_list, lat_min, lat_max, lon_min, lon_max, ma
 
 
 def downloader_daily(date, var_list, lat_min, lat_max, lon_min, lon_max, max_lead_hr=18):
-
     # date: datetime object
 
     run_times = [(date + timedelta(hours=i)).strftime('%Y-%m-%d %H:%M') for i in range(24)]
     datasets = []
 
     for run_time in run_times:
-
         dataset = downloader_hourly(run_time, var_list, lat_min, lat_max, lon_min, lon_max, max_lead_hr)
         datasets.append(dataset)
 
@@ -57,7 +54,6 @@ def downloader_daily(date, var_list, lat_min, lat_max, lon_min, lon_max, max_lea
 
 
 def main():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--saving_path', default='tmp', type=str)
@@ -83,13 +79,12 @@ def main():
     print('saving_path: ', args.saving_path, flush=True)
 
     filename = args.saving_path + f'{args.year:04}{args.month:02}{args.day:02}.nc'
-    Dataset = downloader_daily(date, args.var_list, args.lat_min, args.lat_max, args.lon_min, args.lon_max, max_lead_hr=18)
+    Dataset = downloader_daily(date, args.var_list, args.lat_min, args.lat_max, args.lon_min, args.lon_max,
+                               max_lead_hr=18)
     Dataset.to_netcdf(filename)
 
     print(f'Saved to {filename}!')
 
 
 if __name__ == '__main__':
-
     main()
-

@@ -7,6 +7,7 @@ class ModelType(Enum):
     GNN = 1
     ViT = 2
 
+
 class InterpolationType(Enum):
     none = -1
     Nearest = 0

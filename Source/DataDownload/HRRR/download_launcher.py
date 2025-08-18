@@ -2,7 +2,8 @@ import os
 
 
 class SlurmJob(object):
-    def __init__(self, python_file, task_name, time='1:00:00', mem='10Gb', experiment_root='/home/mila/q/qidong.yang/scratch/HRRR/docs/', **kwargs):
+    def __init__(self, python_file, task_name, time='1:00:00', mem='10Gb',
+                 experiment_root='/home/mila/q/qidong.yang/scratch/HRRR/docs/', **kwargs):
 
         self.time = time
         self.mem = mem
@@ -12,7 +13,7 @@ class SlurmJob(object):
         self.job_name = task_name + ''.join([f'--{k}={v}' for k, v in self.kwargs.items() if k not in ['output_dir']])
 
         self.experiment_path = experiment_root + self.job_name + '/'
-        #self.output_path = self.experiment_path + 'outputs'
+        # self.output_path = self.experiment_path + 'outputs'
         self.slurm_report_path = self.experiment_path + 'slurm_reports' + '/'
         self.slurm_code_path = self.experiment_path + 'slurm_codes' + '/'
 
@@ -92,7 +93,6 @@ class SlurmJob(object):
 
 
 def download():
-
     python_file = '/home/mila/q/qidong.yang/wind_obs_correction/download_code/madis/download_beam.py'
     task_name = 'HRRR_download'
     output_dir = '/home/mila/q/qidong.yang/scratch/HRRR/'
@@ -105,6 +105,4 @@ def download():
 
 
 if __name__ == '__main__':
-
     download()
-

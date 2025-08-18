@@ -77,8 +77,8 @@ class MetaStation(object):
 
                 if len(data.index) > 0:
                     coords_sub = \
-                    data[['longitude', 'latitude', 'year', 'month', 'day', 'hour']].to_pandas().reset_index(
-                        drop=True).drop_duplicates()[['longitude', 'latitude']].values
+                        data[['longitude', 'latitude', 'year', 'month', 'day', 'hour']].to_pandas().reset_index(
+                            drop=True).drop_duplicates()[['longitude', 'latitude']].values
                     counter = counter + Counter(points(coords_sub))
 
         counter = gpd.GeoDataFrame(pd.Series(counter).reset_index().rename(columns={'index': 'geometry', 0: 'num'}))

@@ -1,10 +1,11 @@
 # Author: Qidong Yang & Jonathan Giezendanner
 
+import itertools
+
 import numpy as np
 import torch
 from scipy.spatial import Delaunay
 from torch_geometric.nn import knn_graph
-import itertools
 
 from Settings.Settings import NetworkConstructionMethod
 

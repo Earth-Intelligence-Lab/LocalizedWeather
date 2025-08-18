@@ -1,11 +1,11 @@
 # Author: Qidong Yang & Jonathan Giezendanner
 
-import torch
-from torch import nn as nn
 from typing import Tuple, Optional
 
-from Modules.Transformer.StationsEmbedding import StationEmbed
+import torch
+from torch import nn as nn
 
+from Modules.Transformer.StationsEmbedding import StationEmbed
 from Modules.Transformer.Transformer import Transformer
 
 
@@ -26,16 +26,19 @@ class VisionTransformer(nn.Module):
 
         super().__init__()
 
-        self.station_embed = StationEmbed(madis_len=madis_len, madis_n_vars_i=madis_n_vars_i, era5_len=era5_len, era5_n_vars=era5_n_vars, hidden_dim=dim)
+        self.station_embed = StationEmbed(madis_len=madis_len, madis_n_vars_i=madis_n_vars_i, era5_len=era5_len,
+                                          era5_n_vars=era5_n_vars, hidden_dim=dim)
         self.pos_E = nn.Embedding(n_stations, dim)  # positional embedding matrix
 
-        self.transformer = Transformer(dim=dim, attn_dim=attn_dim, mlp_dim=mlp_dim, num_heads=num_heads, num_layers=num_layers)
+        self.transformer = Transformer(dim=dim, attn_dim=attn_dim, mlp_dim=mlp_dim, num_heads=num_heads,
+                                       num_layers=num_layers)
 
         self.head = nn.Sequential(
             nn.Linear(dim, madis_n_vars_o)
         )
 
-    def forward(self, madis_x: torch.Tensor, era5_x=None, return_attn=False) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+    def forward(self, madis_x: torch.Tensor, era5_x=None, return_attn=False) -> Tuple[
+        torch.Tensor, Optional[torch.Tensor]]:
         # madis_x      (n_batch, n_stations, madis_len, nb_var)
         # era5_x       (n_batch, n_stations, era5_len, nb_var)
         # return_attn  whether to return the attention alphas
@@ -64,4 +67,3 @@ class VisionTransformer(nn.Module):
         # (n_batch, n_stations, madis_n_vars_o)
 
         return out, alphas
-

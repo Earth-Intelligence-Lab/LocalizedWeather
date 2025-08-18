@@ -57,16 +57,15 @@ class ERA5(object):
 
     def build_nodes_data(self, region_data, madis_network, n_neighbors_e2m):
         region_data = region_data.stack(node=('longitude', 'latitude'))
-        region_data = region_data.assign_coords(node_id=(['node'], range(len(region_data.node))))\
-                        .set_index(node='node_id')
+        region_data = region_data.assign_coords(node_id=(['node'], range(len(region_data.node)))) \
+            .set_index(node='node_id')
         pos = torch.from_numpy(np.stack([region_data.longitude, region_data.latitude], axis=-1).astype(np.float32))
-        era5nodes = search_k_neighbors(madis_network.pos, pos, n_neighbors_e2m).long().numpy()[0,:]
+        era5nodes = search_k_neighbors(madis_network.pos, pos, n_neighbors_e2m).long().numpy()[0, :]
         era5nodes = np.sort(np.unique(era5nodes))
         region_data = region_data.isel(node=era5nodes)
         region_data = region_data.chunk()
         region_data.to_netcdf(self.node_file_path)
         return region_data
-
 
     def load_era5_region(self, region, region_file_path):
 
@@ -95,13 +94,15 @@ class ERA5(object):
         return data
 
     def getSample(self, time_sel, variable, network, Madis_len, lead_time):
-        val = torch.from_numpy(np.moveaxis(self.data[variable].sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32), 0, -1))
+        val = torch.from_numpy(
+            np.moveaxis(self.data[variable].sel(time=slice(time_sel[0], time_sel[-1])).values.astype(np.float32), 0,
+                        -1))
 
         return val
 
     def load_ERA5_monthly(self, month, region):
 
-        data_path = self.data_path / 'ERA5' / region / (f'surface_{self.year}_{month}'+self.extension)
+        data_path = self.data_path / 'ERA5' / region / (f'surface_{self.year}_{month}' + self.extension)
         data = xr.open_mfdataset(data_path, engine=self.engine)
 
         data = data.sel(longitude=slice(self.lon_low, self.lon_up), latitude=slice(self.lat_up, self.lat_low))

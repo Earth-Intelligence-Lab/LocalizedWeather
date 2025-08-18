@@ -71,7 +71,8 @@ class MixData(Dataset):
             for external_var in self.external_vars:
                 self.external_mins_dict[external_var] = np.min(self.external_data_object.data[external_var.name].values)
                 self.external_maxs_dict[external_var] = np.max(self.external_data_object.data[external_var.name].values)
-                self.external_means_dict[external_var] = np.mean(self.external_data_object.data[external_var.name].values)
+                self.external_means_dict[external_var] = np.mean(
+                    self.external_data_object.data[external_var.name].values)
                 self.external_stds_dict[external_var] = np.std(self.external_data_object.data[external_var.name].values)
                 self.external_ns_dict[external_var] = self.external_data_object.data[external_var.name].values.size
 
@@ -111,7 +112,6 @@ class MixData(Dataset):
             madis_val_is_real = madis_data[var_name_is_real].values.astype(np.float32)
             sample[var_name_is_real] = madis_val_is_real
 
-
         if self.external_data_object is not None:
             if self.external_network is not None:
                 sample[f'ex2m_edge_index'] = self.external_network.ex2m_edge_index
@@ -122,10 +122,9 @@ class MixData(Dataset):
                 sample[f'external_lon'] = 1
                 sample[f'external_lat'] = 1
 
-
             for external_var in self.external_vars:
-                external_val = self.external_data_object.getSample(time_sel, external_var.name, self.external_network, self.back_hrs+1, self.lead_hours)
+                external_val = self.external_data_object.getSample(time_sel, external_var.name, self.external_network,
+                                                                   self.back_hrs + 1, self.lead_hours)
                 sample['ext_' + external_var.name] = external_val
 
         return sample
-

@@ -7,13 +7,13 @@ import torch
 import xarray as xr
 
 from Dataloader.ERA5 import ERA5
-from Settings.Settings import InterpolationType
-
 from Network.NetworkUtils import search_k_neighbors
+from Settings.Settings import InterpolationType
 
 
 class ERA5Interpolated(ERA5):
-    def __init__(self, year, madis_network, meta_station, n_neighbors_e2m, interpolation_type=InterpolationType.none, region='World', zarr=False,
+    def __init__(self, year, madis_network, meta_station, n_neighbors_e2m, interpolation_type=InterpolationType.none,
+                 region='World', zarr=False,
                  data_path=Path('')):
         self.interpolation_type = interpolation_type
         self.filtered_file_name = meta_station.filtered_file_name
@@ -24,7 +24,8 @@ class ERA5Interpolated(ERA5):
         if self.interpolated_file_path.exists():
             return xr.open_mfdataset(self.interpolated_file_path, engine=self.engine).load()
 
-        self.data = super().get_ERA5(region, madis_network, n_neighbors_e2m, use_node_data=self.interpolation_type in [InterpolationType.Stacked])
+        self.data = super().get_ERA5(region, madis_network, n_neighbors_e2m,
+                                     use_node_data=self.interpolation_type in [InterpolationType.Stacked])
         return self.make_interpolated()
 
     def GetInterpolatedFilePath(self, n_neighbors_e2m):
@@ -52,8 +53,9 @@ class ERA5Interpolated(ERA5):
         if self.interpolation_type == InterpolationType.Nearest:
             self.data = self.data[['u', 'v', 'temp', 'dewpoint']].sortby(['latitude', 'longitude'])
             self.data = self.data.drop(['expver', 'number'])
-            self.data = self.data.interp(latitude=('stations', self.madis_network.pos[:, 1]), longitude=('stations', self.madis_network.pos[:, 0]), method='nearest',
-                                       assume_sorted=True)[['u', 'v', 'temp', 'dewpoint']].load()
+            self.data = self.data.interp(latitude=('stations', self.madis_network.pos[:, 1]),
+                                         longitude=('stations', self.madis_network.pos[:, 0]), method='nearest',
+                                         assume_sorted=True)[['u', 'v', 'temp', 'dewpoint']].load()
 
             self.data['stations'] = self.data.stations.values + 1
             self.data = self.data.transpose('stations', ...)
@@ -61,12 +63,12 @@ class ERA5Interpolated(ERA5):
             self.SaveInterpolatedFile(self.data)
             return self.data
 
-
         if self.interpolation_type == InterpolationType.BiCubic:
             self.data = self.data[['u', 'v', 'temp', 'dewpoint']].sortby(['latitude', 'longitude'])
             self.data = self.data.drop(['expver', 'number'])
-            self.data = self.data.interp(latitude=('stations', self.madis_network.pos[:, 1]), longitude=('stations', self.madis_network.pos[:, 0]), method='cubic',
-                                       assume_sorted=True)[['u', 'v', 'temp', 'dewpoint']].load()
+            self.data = self.data.interp(latitude=('stations', self.madis_network.pos[:, 1]),
+                                         longitude=('stations', self.madis_network.pos[:, 0]), method='cubic',
+                                         assume_sorted=True)[['u', 'v', 'temp', 'dewpoint']].load()
 
             self.data['stations'] = self.data.stations.values + 1
             self.data = self.data.transpose('stations', ...)
@@ -91,4 +93,3 @@ class ERA5Interpolated(ERA5):
         self.interpolated_file_path.parent.mkdir(exist_ok=True, parents=True)
 
         data.to_netcdf(self.interpolated_file_path)
-

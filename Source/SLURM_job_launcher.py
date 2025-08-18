@@ -131,6 +131,7 @@ class SlurmJob(object):
 
         os.system(f'cat {os.path.join(self.slurm_code_path, self.slurm_filename)} | sbatch')
 
+
 def transformer_hrrr_all_vars_model():
     model_name = 'Transformer_all_vars_HRRR'
     model_type = ModelType.ViT.value

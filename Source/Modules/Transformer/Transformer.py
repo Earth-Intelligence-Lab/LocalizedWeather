@@ -1,9 +1,10 @@
 # Author: Qidong Yang & Jonathan Giezendanner
 
+from typing import Tuple, Optional
+
 import numpy as np
 import torch
 from torch import nn as nn
-from typing import Tuple, Optional
 
 
 class AttentionHead(nn.Module):
@@ -149,7 +150,8 @@ class Transformer(nn.Module):
 
         self.layers = nn.ModuleList([AttentionResidual(dim, attn_dim, mlp_dim, num_heads) for _ in range(num_layers)])
 
-    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor, return_attn=False) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor, return_attn=False) -> Tuple[
+        torch.Tensor, Optional[torch.Tensor]]:
         # x                the inputs. shape: (B x T x dim)
         # attn_mask        an attention mask. Pass this to each of the AttentionResidual layers!
         #                  shape: (B x T x T)

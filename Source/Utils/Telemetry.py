@@ -44,7 +44,8 @@ class Telemetry:
                     .append(per_variable_loss[madis_var][per_variable_metrics_type])
 
     def report(self, epoch, lr):
-        print('Epoch: %d train_loss[%.5f] valid_loss[%.5f]' % (epoch + 1, self.losses['train'][-1], self.losses['val'][-1]), flush=True)
+        print('Epoch: %d train_loss[%.5f] valid_loss[%.5f]' % (epoch + 1, self.losses['train'][-1],
+                                                               self.losses['val'][-1]), flush=True)
         print(' ', flush=True)
 
     def finish_run(self, best_metrics, figures_path):
@@ -58,9 +59,8 @@ class Telemetry:
         for madis_var in self.madis_vars_o:
             for per_variable_metrics_type in self.per_variable_metrics_types:
                 self.plot_metric(self.per_variable_losses['train'][madis_var][per_variable_metrics_type],
-                            self.per_variable_losses['val'][madis_var][per_variable_metrics_type],
-                            madis_var.name + ' ' + per_variable_metrics_type.name, figures_path)
-
+                                 self.per_variable_losses['val'][madis_var][per_variable_metrics_type],
+                                 madis_var.name + ' ' + per_variable_metrics_type.name, figures_path)
 
     def plot_metric(self, train_losses, valid_losses, metric_name, fig_path, y_range=None):
         fig, axs = plt.subplots(1, 1, figsize=(10, 5))
@@ -81,6 +81,7 @@ class Telemetry:
 
         plt.savefig(fig_path / ('_'.join(metric_name.split(' ')) + '_plot.png'))
         plt.close()
+
 
 class WBTelemetry(Telemetry):
     def __init__(self, madis_vars_o, per_variable_metrics_types, args, output_saving_path):
@@ -129,4 +130,3 @@ class WBTelemetry(Telemetry):
                     self.wb.summary[f"{madis_var.name}_{per_variable_metrics_type.name}"] = val
 
         self.wb.finish()
-

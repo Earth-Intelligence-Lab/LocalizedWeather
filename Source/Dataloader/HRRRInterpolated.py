@@ -9,10 +9,11 @@ from Settings.Settings import InterpolationType
 
 
 class HRRRInterpolated(HRRR):
-    def __init__(self, meta_station, madis_network, year, reanalysis_only=True, resampling_index_raw=None, resampling_index=None,
+    def __init__(self, meta_station, madis_network, year, reanalysis_only=True, resampling_index_raw=None,
+                 resampling_index=None,
                  region='Northeastern', data_path=Path('')):
         HRRR.__init__(self, meta_station, madis_network, year, reanalysis_only, resampling_index_raw, resampling_index,
-                 region, data_path)
+                      region, data_path)
 
     def make_interpolated(self, external_network, interpolation_type, madis_data, n_neighbors_ex2m, meta_station):
         interpolated_file_path = self.data_path / 'HRRR' / self.region / 'Interpolated' / f'HRRRinterpolated_h2m_{n_neighbors_ex2m}_{interpolation_type.name}_{self.year}_{meta_station.filtered_file_name}.nc'

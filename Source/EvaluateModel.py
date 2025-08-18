@@ -34,7 +34,6 @@ class EvaluateModel:
         self.show_progress_bar = show_progress_bar
         self.optimizer = optimizer
 
-
     def call_evaluate(self, station_type='train', save=False):
         data_loader = self.data_loaders[station_type]
         self.is_train = station_type == 'train'
@@ -95,8 +94,9 @@ class EvaluateModel:
                 if self.is_train:
                     self.optimizer.zero_grad()
 
-                out, alphas = self.RunModel(edge_index_ex2m, edge_index_m2m, external_lat, external_lon, external_x, madis_lat,
-                                    madis_lon, madis_x)
+                out, alphas = self.RunModel(edge_index_ex2m, edge_index_m2m, external_lat, external_lon, external_x,
+                                            madis_lat,
+                                            madis_lon, madis_x)
 
                 is_real = self.GetIsReal()
                 if self.is_train:
@@ -112,7 +112,8 @@ class EvaluateModel:
                 n_report += out[..., 0].numel()
 
                 for save_metric in self.save_metrics_types:
-                    save_metrics_dict[save_metric] += self.save_metrics_functions[save_metric](out.detach(), y.detach(), is_real).cpu().numpy()
+                    save_metrics_dict[save_metric] += self.save_metrics_functions[save_metric](out.detach(), y.detach(),
+                                                                                               is_real).cpu().numpy()
 
                 # denormalize output
                 for k, madis_var in enumerate(self.madis_vars_o):
@@ -145,7 +146,8 @@ class EvaluateModel:
                     # (n_stations, 1)
                     nb_obs[madis_var] += torch.numel(out_k)
                     for per_variable_metrics_type in self.per_variable_metrics_types:
-                        per_variable_loss[madis_var][per_variable_metrics_type] += np.sum(self.per_variable_metrics[per_variable_metrics_type](out_k, y_k).cpu().numpy())
+                        per_variable_loss[madis_var][per_variable_metrics_type] += np.sum(
+                            self.per_variable_metrics[per_variable_metrics_type](out_k, y_k).cpu().numpy())
 
         for madis_var in self.madis_vars_o:
             for per_variable_metrics_type in self.per_variable_metrics_types:

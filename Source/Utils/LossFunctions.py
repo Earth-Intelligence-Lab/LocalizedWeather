@@ -11,7 +11,7 @@ def wind_loss(output, target, logical=None, reduction='mean'):
     u_error = output[..., 0] - target[..., 0]
     v_error = output[..., 1] - target[..., 1]
 
-    error = torch.sqrt((u_error**2) + (v_error**2) + torch.finfo(torch.float32).eps)
+    error = torch.sqrt((u_error ** 2) + (v_error ** 2) + torch.finfo(torch.float32).eps)
 
     if logical is not None:
         error = error[logical[..., 0]]
@@ -25,8 +25,9 @@ def wind_loss(output, target, logical=None, reduction='mean'):
 
     return None
 
+
 def custom_loss(output, target, u_index, v_index, other_index, logical=None, reduction='mean'):
-    error = (output - target)**2
+    error = (output - target) ** 2
 
     u_error = error[..., u_index]
     v_error = error[..., v_index]
@@ -49,6 +50,7 @@ def custom_loss(output, target, u_index, v_index, other_index, logical=None, red
 
     return None
 
+
 def GetLossFunction(loss_function_type, madis_vars_o):
     if loss_function_type == LossFunctionType.MSE:
         loss_function = lambda output, target, logical: nn.MSELoss(reduction='mean')(output, target)
@@ -67,6 +69,7 @@ def GetLossFunction(loss_function_type, madis_vars_o):
         raise ValueError(f"Unknown loss function type: {loss_function_type}")
 
     return loss_function
+
 
 def GetLossFunctionReport(loss_function_type, madis_vars_o):
     if loss_function_type == LossFunctionType.MSE:
@@ -88,6 +91,7 @@ def GetLossFunctionReport(loss_function_type, madis_vars_o):
 
     return loss_function_report
 
+
 def SetupSaveMetrics(save_metrics_types, madis_vars_o):
     save_metrics = dict()
     for save_metric_type in save_metrics_types:
@@ -107,8 +111,9 @@ def SetupSaveMetrics(save_metrics_types, madis_vars_o):
             v_index = np.where(v_index)[0][0]
             other_index = np.where(other_index)[0]
 
-            save_metrics[save_metric_type] = lambda output, target, logical: custom_loss(output, target, u_index, v_index,
-                                                                                     other_index, reduction='sum')
+            save_metrics[save_metric_type] = lambda output, target, logical: custom_loss(output, target, u_index,
+                                                                                         v_index,
+                                                                                         other_index, reduction='sum')
             continue
 
     return save_metrics

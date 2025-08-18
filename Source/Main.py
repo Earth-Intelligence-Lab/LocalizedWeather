@@ -19,12 +19,12 @@ from Dataloader.MetaStation import MetaStation
 from Dataloader.MixData import MixData
 from EvaluateModel import EvaluateModel
 from Modules.GNN.MPNN import MPNN
-from Utils.LossFunctions import GetLossFunctionReport, GetLossFunction, SetupSaveMetrics
 from Modules.Transformer.ViT import VisionTransformer
 from Network.ERA5Network import ERA5Network
 from Network.HRRRNetwork import HRRNetwork
 from Network.MadisNetwork import MadisNetwork
 from Settings.Settings import ModelType, LossFunctionType, InterpolationType
+from Utils.LossFunctions import GetLossFunctionReport, GetLossFunction, SetupSaveMetrics
 from Utils.Telemetry import Telemetry, WBTelemetry
 
 
@@ -41,7 +41,8 @@ class Main:
             self.lon_low, self.lon_up, self.lat_low, self.lat_up = args.coords
         else:
             self.shapefile_path = self.data_path / self.shapefile_path
-            self.lon_low, self.lat_low, self.lon_up, self.lat_up = gpd.read_file(self.shapefile_path).bounds.iloc[0].values
+            self.lon_low, self.lat_low, self.lon_up, self.lat_up = gpd.read_file(self.shapefile_path).bounds.iloc[
+                0].values
 
         self.back_hrs = args.back_hrs
         self.lead_hrs = args.lead_hrs
@@ -92,26 +93,30 @@ class Main:
         np.random.seed(100)
 
         ##### Get Device #####
-        device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
+        device = torch.device(
+            'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
 
         ##### Load Data #####
-        meta_station = MetaStation(self.lat_low, self.lat_up, self.lon_low, self.lon_up, self.n_years, self.madis_control_ratio,
+        meta_station = MetaStation(self.lat_low, self.lat_up, self.lon_low, self.lon_up, self.n_years,
+                                   self.madis_control_ratio,
                                    shapefile_path=self.shapefile_path, data_path=self.data_path)
 
-        self.madis_network = self.BuildMadisNetwork(meta_station, self.n_neighbors_m2m, self.network_construction_method)
+        self.madis_network = self.BuildMadisNetwork(meta_station, self.n_neighbors_m2m,
+                                                    self.network_construction_method)
 
         years = list(range(2024 - self.n_years, 2024))
 
         external_data_objects, self.external_len, self.external_network, n_neighbors_ex2m = self.BuildExternalNetwork(
-                                                                                     self.data_path,
-                                                                                     self.external_len,
-                                                                                     self.hrrr_analysis_only,
-                                                                                     self.interpolation_type, self.lead_hrs,
-                                                                                     self.madis_network, meta_station,
-                                                                                     self.n_neighbors_e2m, self.n_neighbors_h2m,
-                                                                                     self.whole_len, years)
+            self.data_path,
+            self.external_len,
+            self.hrrr_analysis_only,
+            self.interpolation_type, self.lead_hrs,
+            self.madis_network, meta_station,
+            self.n_neighbors_e2m, self.n_neighbors_h2m,
+            self.whole_len, years)
 
-        Data_List = self.GetDataList(self.back_hrs, self.data_path, external_data_objects, self.external_network, self.external_vars,
+        Data_List = self.GetDataList(self.back_hrs, self.data_path, external_data_objects, self.external_network,
+                                     self.external_vars,
                                      self.lead_hrs, self.madis_vars, meta_station, years)
 
         if external_data_objects:
@@ -122,7 +127,8 @@ class Main:
 
         n_stations = self.madis_network.n_stations
 
-        madis_norm_dict, external_norm_dict = NormalizerBuilder.get_normalizers(Data_List, external_data_objects, self.madis_vars, self.external_vars)
+        madis_norm_dict, external_norm_dict = NormalizerBuilder.get_normalizers(Data_List, external_data_objects,
+                                                                                self.madis_vars, self.external_vars)
 
         serialized_data = pickle.dumps(madis_norm_dict)
         with open(self.output_saving_path / f'madis_norm_dict.pkl', 'wb') as file:
@@ -152,12 +158,12 @@ class Main:
 
         use_wb = self.use_wb
         if use_wb:
-            telemetry = WBTelemetry(self.madis_vars_o, self.per_variable_metrics_types, self.args, self.output_saving_path)
+            telemetry = WBTelemetry(self.madis_vars_o, self.per_variable_metrics_types, self.args,
+                                    self.output_saving_path)
         else:
             telemetry = Telemetry(self.madis_vars_o, self.per_variable_metrics_types)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
-
 
         min_valid_losses = dict()
         for save_metric_type in self.save_metrics_types:
@@ -189,7 +195,8 @@ class Main:
                                                                     evaluateModel.save_metric_dict[save_metric_type],
                                                                     save_metric_type.name, self.output_saving_path)
 
-        best_metrics = self.AtTrainingEnd(self.save_metrics_types, evaluateModel_fun, self.madis_network, self.output_saving_path)
+        best_metrics = self.AtTrainingEnd(self.save_metrics_types, evaluateModel_fun, self.madis_network,
+                                          self.output_saving_path)
 
         telemetry.finish_run(best_metrics, self.figures_path)
 
@@ -273,7 +280,6 @@ class Main:
                              hrrr_analysis_only, interpolation_type, lead_hrs, madis_network, meta_station,
                              n_neighbors_e2m, n_neighbors_h2m, whole_len, years):
 
-
         external_data_objects = None
         external_network = None
         n_neighbors_ex2m = None
@@ -292,7 +298,8 @@ class Main:
                                                               interpolation_type, data_path=data_path)
 
             if interpolation_type == InterpolationType.none:
-                external_network = self.BuildERA5Network(external_data_objects[years[0]].data, madis_network, n_neighbors_e2m)
+                external_network = self.BuildERA5Network(external_data_objects[years[0]].data, madis_network,
+                                                         n_neighbors_e2m)
 
             n_neighbors_ex2m = n_neighbors_e2m
 
@@ -337,7 +344,6 @@ class Main:
 
         return new_valid_loss
 
-
     def SaveTest(self, evaluateModelTest, madis_network, metric, output_saving_path):
 
         serialized_data = pickle.dumps(madis_network)
@@ -370,7 +376,6 @@ class Main:
         print('Runing best model for test set')
         best_metrics = dict()
         for save_metric_type in save_metrics_types:
-
             evaluateModel = evaluateModelCaller()
 
             modelPath = os.path.join(output_saving_path, f'model_{save_metric_type.name}_min.pt')
@@ -386,5 +391,3 @@ class Main:
             self.SaveTest(evaluateModel, madis_network, save_metric_type.name, output_saving_path)
 
         return best_metrics
-
-

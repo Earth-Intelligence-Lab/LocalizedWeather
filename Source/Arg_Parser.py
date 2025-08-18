@@ -4,9 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
+import Main
 from PostProcessInputs import PostProcessArgs
 from Settings.Settings import *
-import Main
 
 if __name__ == '__main__':
 
@@ -15,10 +15,13 @@ if __name__ == '__main__':
     ## Model
     parser.add_argument('--model_type', default=ModelType.ViT.value, type=int)
 
-    parser.add_argument('--madis_vars_i', default=(EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value, EnvVariables.dewpoint.value), type=int, nargs='+')
-    parser.add_argument('--madis_vars_o', default=(EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value, EnvVariables.dewpoint.value), type=int, nargs='+')
+    parser.add_argument('--madis_vars_i', default=(EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value,
+                                                   EnvVariables.dewpoint.value), type=int, nargs='+')
+    parser.add_argument('--madis_vars_o', default=(EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value,
+                                                   EnvVariables.dewpoint.value), type=int, nargs='+')
 
-    parser.add_argument('--external_vars', default=(EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value, EnvVariables.dewpoint.value), type=int, nargs='+')
+    parser.add_argument('--external_vars', default=(EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value,
+                                                    EnvVariables.dewpoint.value), type=int, nargs='+')
 
     ## Graph
     parser.add_argument('--network_construction_method', default=NetworkConstructionMethod.none.value, type=int)
@@ -57,10 +60,8 @@ if __name__ == '__main__':
     # To use weights and biases (wb), you need to modify Utils/Telemetry.py and specify `project` and `entity`
     parser.add_argument('--use_wb', default=0, type=int)
 
-
     ## process args
     args = parser.parse_args()
-
 
     save_args = vars(args).copy()
 

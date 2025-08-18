@@ -3,9 +3,9 @@
 import json
 from pathlib import Path
 
+import Main
 from PostProcessInputs import PostProcessArgs
 from Settings.Settings import *
-import Main
 
 
 class AttrDict(dict):
@@ -14,6 +14,7 @@ class AttrDict(dict):
 
     def __setattr__(self, key, value):
         self[key] = value
+
 
 if __name__ == '__main__':
     args = AttrDict()
@@ -46,11 +47,12 @@ if __name__ == '__main__':
     args.n_neighbors_m2m = 0
     args.loss_function_type = LossFunctionType.CUSTOM.value
 
-    args.madis_vars_i = [EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value, EnvVariables.dewpoint.value]
-    args.madis_vars_o = [EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value, EnvVariables.dewpoint.value]
+    args.madis_vars_i = [EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value,
+                         EnvVariables.dewpoint.value]
+    args.madis_vars_o = [EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value,
+                         EnvVariables.dewpoint.value]
 
     args.external_vars = [EnvVariables.u.value, EnvVariables.v.value, EnvVariables.temp.value]
-
 
     args.data_path = '/Users/jonathangiezendanner/Documents/MIT/Projects/WindDataNE-US/'
     args.show_progress_bar = True

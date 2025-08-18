@@ -2,6 +2,7 @@
 
 import numpy as np
 import torch
+
 from Network.NetworkUtils import search_k_neighbors
 
 
@@ -19,4 +20,3 @@ class ERA5Network:
 
     def GetNetwork(self):
         self.ex2m_edge_index = search_k_neighbors(self.MadisNetwork.pos, self.pos, self.n_neighbors_e2m).long()
-

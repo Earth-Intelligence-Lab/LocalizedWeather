@@ -13,7 +13,7 @@ def get_normalizers(Data_List, external_object, madis_vars, external_vars, scali
     madis_means = dict()
     madis_stds = dict()
     madis_ns = dict()
-    madis_norm_dict= dict()
+    madis_norm_dict = dict()
 
     for madis_var in madis_vars:
         madis_var_mins = []
@@ -123,7 +123,8 @@ def get_normalizers(Data_List, external_object, madis_vars, external_vars, scali
             external_v_min = np.min(np.array(external_mins[EnvVariables.v]))
             external_v_max = np.max(np.array(external_maxs[EnvVariables.v]))
 
-            external_scale = np.max(np.array([np.abs(external_u_min), np.abs(external_v_min), external_u_max, external_v_max]))
+            external_scale = np.max(
+                np.array([np.abs(external_u_min), np.abs(external_v_min), external_u_max, external_v_max]))
             external_std = np.max(np.array([external_stds[EnvVariables.u], external_stds[EnvVariables.v]]))
 
             if scaling == ScalingType.MinMax:
@@ -138,9 +139,11 @@ def get_normalizers(Data_List, external_object, madis_vars, external_vars, scali
                 continue
 
             if scaling == ScalingType.MinMax:
-                external_norm_dict[external_var] = MinMaxNormalizer(external_mins[external_var], external_maxs[external_var])
+                external_norm_dict[external_var] = MinMaxNormalizer(external_mins[external_var],
+                                                                    external_maxs[external_var])
             elif scaling == ScalingType.Standard:
-                external_norm_dict[external_var] = StandardNormalizer(external_means[external_var], external_stds[external_var])
+                external_norm_dict[external_var] = StandardNormalizer(external_means[external_var],
+                                                                      external_stds[external_var])
     else:
         external_norm_dict = None
 
