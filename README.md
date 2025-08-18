@@ -1,4 +1,4 @@
-# Localized Weather GNN
+# Localized Weather
 
 This repository contains the code and data for the paper ["Multi-Modal Graph Neural Networks for Localized Off-Grid Weather Forecasting"](https://arxiv.org/abs/2410.12938).
 
