@@ -11,7 +11,6 @@ class StationEmbed(nn.Module):
         # era5_n_vars     the number of era5 variable as input
 
         super().__init__()
-        self.modalities_station_merge = modalities_station_merge
 
         self.madis_len = madis_len
         self.hidden_dim = hidden_dim
