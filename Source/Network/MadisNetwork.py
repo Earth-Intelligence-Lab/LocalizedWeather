@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from scipy.spatial import Delaunay
 from torch_geometric.nn import knn_graph
+import itertools
 
 from Settings.Settings import NetworkConstructionMethod
 
@@ -35,7 +36,8 @@ class MadisNetwork:
 
     def BuildMadisNetwork(self, lon, lat):
         pos = torch.cat([lon, lat], dim=1)
-        
+        k_edge_index = torch.empty((2, 0), dtype=torch.long)
+
         if self.network_construction_method == NetworkConstructionMethod.KNN:
             k_edge_index = knn_graph(pos, k=self.n_neighbors_m2m, batch=torch.zeros((len(pos),)), loop=False)
         elif self.network_construction_method == NetworkConstructionMethod.DELAUNAY:
@@ -44,5 +46,7 @@ class MadisNetwork:
             k_edge_index = np.moveaxis(
                 np.unique(np.concatenate([k_edge_index, np.flip(k_edge_index, axis=1)]), axis=0), 0, 1)
             k_edge_index = torch.from_numpy(k_edge_index)
+        elif self.network_construction_method == NetworkConstructionMethod.FULLY_CONNECTED:
+            k_edge_index = torch.tensor(list(itertools.permutations(list(range(len(pos))), 2)), dtype=torch.long).t()
 
         return k_edge_index

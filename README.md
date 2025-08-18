@@ -1,21 +1,21 @@
 # Localized Weather GNN
 
-This repository contains the code and data for the paper ["Local Off-Grid Weather Forecasting with Multi-Modal Earth Observation Data"](https://arxiv.org/abs/2410.12938).
+This repository contains the code and data for the paper ["Multi-Modal Graph Neural Networks for Localized Off-Grid Weather Forecasting"](https://arxiv.org/abs/2410.12938).
 
-The paper presents a novel multi-modal deep learning method that downscales gridded weather forecasts, such as ERA5 and HRRR, to provide accurate off-grid predictions. The model leverages both gridded data and local weather station observations from MADIS to make predictions that reflect both large-scale atmospheric dynamics and local weather patterns.
+The paper presents a novel multi-modal graph neural network (GNN) that downscales gridded weather forecasts, such as ERA5, to provide accurate off-grid predictions. The model leverages both ERA5 data and local weather station observations from MADIS to make predictions that reflect both large-scale atmospheric dynamics and local weather patterns.
 
-The model is evaluated on a surface wind prediction task and shows significant improvement over baseline methods, including ERA5 interpolation, HRRR re-analysis and HRRR forecast and a multi-layer perceptron.
+The model is evaluated on a surface wind prediction task and shows significant improvement over baseline methods, including ERA5 interpolation and a multi-layer perceptron.
 
 Use the following citation when these data or model are used:
 > Yang, Q.; Giezendanner, J.; Civitarese, D. S.; Jakubik, J.; 
-,Schmitt E.; Chandra, A.; Vila, J.; Hohl, D.; Hill, C.; Watson, C.; Wang, S.; Local Off-Grid Weather Forecasting with Multi-Modal Earth Observation Data. arXiv, October 2024. https://doi.org/10.48550/arXiv.2410.12938
+,Schmitt E.; Chandra, A.; Vila, J.; Hohl, D.; Hill, C.; Watson, C.; Wang, S.; Multi-modal graph neural networks for localized off-grid weather forecasting. arXiv, October 2024. https://doi.org/10.48550/arXiv.2410.12938
 
 
 
 # Model and data
 ## Data
 
-The data for training, testing and validation can be found on [Zenodo](https://zenodo.org/records/15346612).
+The data for training, testing and validation can be found on [Zenodo](https://zenodo.org/records/13948611).
 
 The following data is available:
 - Shapefile of the Northeastern United States (NE-US, extracted from [NWS](https://www.weather.gov/gis/USStates))
@@ -27,6 +27,7 @@ For MADIS and ERA5, the following variables are available:
 - u and v component of wind vector at 10 meters above ground
 - temperature at 2 meters above ground
 - dewpoint at 2 meters above ground
+- solar radiation
 
 The data can also be generated from scratch.
 For this, code is available under `Source/DataDownload/{ERA5/MADIS}.py` for the raw data download, and in the respective data loaders for the data processing (`Source/Dataloader/{ERA5/MetaStation/Madis/MixDataMLP}.py`).

@@ -1,6 +1,7 @@
 # Author: Qidong Yang & Jonathan Giezendanner
 
 import os
+import sys
 from pathlib import Path
 
 import geopandas as gpd
@@ -39,27 +40,32 @@ class Madis(object):
 
         self.data_path = data_path
 
-        meta_year_cover = f'Meta--{2024 - self.n_years}--2023'
-        meta_year_folder = self.data_path / f'madis/processed/{meta_year_cover}'
-        # meta_year_folder = self.data_path/f'madis/SyntheticERA5/{meta_year_cover}'
-        madis_raw_filename = f'madis_{self.years[0]}_{file_name}.nc'
-        madis_filename = f'madis_{self.years[0]}_{filtered_file_name}.nc'
+        extension = 'nc'
+        engine = 'netcdf4'
+
+        meta_year_cover = f'Meta-{2024 - self.n_years}-2023'
+        meta_year_folder = self.data_path / f'madis'/'processed'/meta_year_cover
+        madis_raw_filename = f'madis_{self.years[0]}_{file_name}.{extension}'
+        madis_filename = f'madis_{self.years[0]}_{filtered_file_name}.{extension}'
 
         if os.path.exists(meta_year_folder) == False:
             os.system(f'mkdir -p {meta_year_folder}')
 
         self.madis_raw_ds_path = f'{meta_year_folder}/{madis_raw_filename}'
         self.madis_ds_path = f'{meta_year_folder}/{madis_filename}'
+        
 
         if os.path.exists(self.madis_ds_path):
-            self.ds_xr = xr.open_dataset(self.madis_ds_path)
+            self.ds_xr = xr.open_mfdataset(self.madis_ds_path, engine=engine)
         else:
             rawdata = self.createRawFile()
             self.ds_xr = self.createFile(rawdata)
 
+        self.ds_xr = self.ds_xr.load()
+
     def createRawFile(self):
         if (os.path.exists(self.madis_raw_ds_path)):
-            rawData = xr.open_dataset(self.madis_raw_ds_path)
+            rawData = xr.open_mfdataset(self.madis_raw_ds_path)
         else:
 
             madis_ds = self.loadData()
@@ -124,7 +130,7 @@ class Madis(object):
     def load_madis_monthly(self, year, month):
         data_path = self.data_path / f'madis/raw_monthly/mesonet/{year}/{month}.nc'
 
-        data = xr.open_dataset(data_path)
+        data = xr.open_mfdataset(data_path)
 
         wind_speed_check = ((data.windSpeedDD == b'S') + (data.windSpeedDD == b'V'))
         wind_direction_check = ((data.windDirDD == b'S') + (data.windDirDD == b'V'))

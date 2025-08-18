@@ -38,11 +38,13 @@ class MetaStation(object):
         if os.path.exists(self.all_station_file):
             self.stations_raw = gpd.read_file(self.all_station_file)
         else:
+            print(f'All Station files does not exist at {self.all_station_file}')
             self.stations_raw = self.generate_station_table()
 
         if os.path.exists(self.station_file):
             self.stations = gpd.read_file(self.station_file)
         elif os.path.exists(self.all_station_file):
+            print(f'Station files does not exist at {self.all_station_file}')
             self.stations = self.generate_filtered_station_table(self.stations_raw)
 
     def generate_station_table(self):
@@ -55,12 +57,11 @@ class MetaStation(object):
                 print(f'Generating station table for month {month}', flush=True)
 
                 data_dir = self.data_dir(year, month)
-                data = xr.open_dataset(data_dir)
+                data = xr.open_mfdataset(data_dir)
 
                 wind_speed_check = ((data.windSpeedDD == b'S') + (data.windSpeedDD == b'V'))
                 wind_direction_check = ((data.windDirDD == b'S') + (data.windDirDD == b'V'))
                 temperature_check = ((data.temperatureDD == b'S') + (data.temperatureDD == b'V'))
-                # Todo this should account for dynamic wind speed
                 wind_speed_amplitude_check = (data.windSpeed < 50)
                 validobs = wind_speed_check & wind_direction_check & temperature_check & wind_speed_amplitude_check
 
