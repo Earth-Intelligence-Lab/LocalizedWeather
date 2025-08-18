@@ -1,177 +1,237 @@
-# This file contains functions to evaluate model performance.
 # Author: Qidong Yang & Jonathan Giezendanner
-# Date: 2024-02-14
 
 import numpy as np
 import torch
-import torch.nn.functional as F
+from torch import nn
 from tqdm import tqdm
 
 from Settings.Settings import ModelType
 
 
-def evaluate_model(model,
-                   data_loader,
-                   madis_norm_dict,
-                   era5_norm_dict,
-                   device,
-                   lead_hrs,
-                   loss_function=None,
-                   optimizer=None,
-                   save=False,
-                   model_type=ModelType.GNN,
-                   station_type='train',
-                   show_progress_bar=False):
-    is_train = station_type == 'train'
+class EvaluateModel:
 
-    MSE_u_sum = 0
-    MSE_v_sum = 0
+    def __init__(self, model, data_loaders, madis_norm_dict, external_norm_dict, device, lead_hrs, madis_vars_i,
+                 madis_vars_o, madis_vars, external_vars, loss_function=None, loss_function_report=None,
+                 save_metrics_types=None, save_metrics_functions=None, per_variable_metrics_types=None,
+                 per_variable_metrics=None, model_type=ModelType.GNN, show_progress_bar=False, optimizer=None):
+        self.model = model
+        self.data_loaders = data_loaders
+        self.madis_norm_dict = madis_norm_dict
+        self.external_norm_dict = external_norm_dict
+        self.device = device
+        self.lead_hrs = lead_hrs
+        self.madis_vars_i = madis_vars_i
+        self.madis_vars_o = madis_vars_o
+        self.madis_vars = madis_vars
+        self.external_vars = external_vars
+        self.loss_function = loss_function
+        self.loss_function_report = loss_function_report
+        self.save_metrics_types = save_metrics_types
+        self.save_metrics_functions = save_metrics_functions
+        self.per_variable_metrics_types = per_variable_metrics_types
+        self.per_variable_metrics = per_variable_metrics
+        self.model_type = model_type
+        self.show_progress_bar = show_progress_bar
+        self.optimizer = optimizer
 
-    MAE_u_sum = 0
-    MAE_v_sum = 0
 
-    if save == True:
-        Pred_list = []
-        Target_list = []
+    def call_evaluate(self, station_type='train', save=False):
+        data_loader = self.data_loaders[station_type]
+        self.is_train = station_type == 'train'
 
-    if is_train:
-        model.train()
-    else:
-        model.eval()
+        per_variable_loss = dict()
 
-    print(f'runing {station_type}', flush=True)
+        nb_obs = dict()
 
-    with torch.set_grad_enabled(is_train):
-        loopItems = tqdm(data_loader) if show_progress_bar else data_loader
-        for k, sample in enumerate(loopItems):
-            madis_u = sample[f'madis_u'].to(device)
-            madis_v = sample[f'madis_v'].to(device)
-            madis_temp = sample[f'madis_temp'].to(device)
-            # (n_batch, n_stations, n_times)
+        for madis_var in self.madis_vars_o:
+            nb_obs[madis_var] = 0
+            per_variable_loss[madis_var] = dict()
+            for per_variable_metrics_type in self.per_variable_metrics_types:
+                per_variable_loss[madis_var][per_variable_metrics_type] = 0
 
-            madis_lon = sample[f'madis_lon'].to(device)
-            madis_lat = sample[f'madis_lat'].to(device)
+        loss_report = 0
+        n_report = 0
 
-            edge_index_m2m = sample[f'k_edge_index'].to(device)
+        if save == True:
+            Pred_list = []
+            Target_list = []
+            atten_n = None
+            atten_sum = None
+            atten_max = None
+            time_list = []
 
-            # normalize input
-            madis_u = madis_norm_dict['u'].encode(madis_u)
-            madis_v = madis_norm_dict['v'].encode(madis_v)
-            madis_temp = madis_norm_dict['temp'].encode(madis_temp)
+        save_metrics_dict = dict()
+        for save_metric in self.save_metrics_types:
+            save_metrics_dict[save_metric] = 0
 
-            madis_matrix_len = madis_u.shape[2]
+        if self.is_train:
+            self.model.train()
+        else:
+            self.model.eval()
 
-            x_madis_u = madis_u[:, :, :madis_matrix_len - lead_hrs]
-            x_madis_v = madis_v[:, :, :madis_matrix_len - lead_hrs]
-            x_madis_temp = madis_temp[:, :, :madis_matrix_len - lead_hrs]
+        print(f'runing {station_type}', flush=True)
 
-            y_u = madis_u[:, :, [-1]]
-            y_v = madis_v[:, :, [-1]]
+        with torch.set_grad_enabled(self.is_train):
+            loopItems = tqdm(data_loader) if self.show_progress_bar else data_loader
+            for sample_k, sample in enumerate(loopItems):
+                self.sample_k = sample_k
+                self.sample = sample
 
-            madis_x = torch.cat((x_madis_temp.unsqueeze(3), x_madis_u.unsqueeze(3), x_madis_v.unsqueeze(3)), dim=3)
+                edge_index_m2m, madis_lat, madis_lon, madis_x, y = self.ProcessSampleMadis(self.sample)
 
-            if era5_norm_dict is not None:
-                era5_u = sample[f'era5_u'].to(device)
-                era5_v = sample[f'era5_v'].to(device)
-                era5_temp = sample[f'era5_temp'].to(device)
-                # (n_batch, n_stations, n_times)
+                if self.external_norm_dict is not None:
+                    edge_index_ex2m, external_lat, external_lon, external_x = self.GetERA5Sample()
+                    edge_index_ex2m = edge_index_ex2m.to(self.device)
+                    external_lat = external_lat.to(self.device)
+                    external_lon = external_lon.to(self.device)
+                    external_x = external_x.to(self.device)
 
-                era5_lon = sample[f'era5_lon'].to(device)
-                era5_lat = sample[f'era5_lat'].to(device)
+                else:
+                    external_lon = None
+                    external_lat = None
+                    external_x = None
+                    edge_index_ex2m = None
 
-                era5_u = era5_norm_dict['u'].encode(era5_u)
-                era5_v = era5_norm_dict['v'].encode(era5_v)
-                era5_temp = era5_norm_dict['temp'].encode(era5_temp)
+                if self.is_train:
+                    self.optimizer.zero_grad()
 
-                edge_index_e2m = sample[f'e2m_edge_index'].to(device)
+                out, alphas = self.RunModel(edge_index_ex2m, edge_index_m2m, external_lat, external_lon, external_x, madis_lat,
+                                    madis_lon, madis_x)
 
-                era5_x = torch.cat((era5_temp.unsqueeze(3), era5_u.unsqueeze(3), era5_v.unsqueeze(3)), dim=3)
+                is_real = self.GetIsReal()
+                if self.is_train:
+                    ls = self.loss_function(out, y, is_real)
+                    ls.backward()
+                    if type(self.model) is nn.DataParallel:
+                        torch.nn.utils.clip_grad_norm_(self.model.module.parameters(), max_norm=1.0)
+                    else:
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+                    self.optimizer.step()
 
-                b, s, t, v = era5_x.shape
-                era5_x = era5_x.view(b * s, t, v) if ((model_type == ModelType.MLP) or (model_type == ModelType.MPNN_MLP)) else era5_x.view(b, s, t * v)
+                loss_report += self.loss_function_report(out.detach(), y.detach()).cpu().numpy()
+                n_report += out[..., 0].numel()
 
+                for save_metric in self.save_metrics_types:
+                    save_metrics_dict[save_metric] += self.save_metrics_functions[save_metric](out.detach(), y.detach(), is_real).cpu().numpy()
+
+                # denormalize output
+                for k, madis_var in enumerate(self.madis_vars_o):
+                    y[..., k] = self.madis_norm_dict[madis_var].decode(y[..., k])
+                    out[..., k] = self.madis_norm_dict[madis_var].decode(out[..., k])
+                # (n_batch, n_stations, 2)
+
+                if save == True:
+                    out_save, y_save = self.GetPredictionAndTargetForSaving(out, y)
+
+                    if alphas is not None:
+                        alphas = alphas.detach().cpu().numpy()
+                        if atten_sum is None:
+                            atten_sum = alphas.sum(axis=0)
+                            atten_max = alphas.max(axis=0, keepdims=True)
+                            atten_n = alphas.shape[0]
+                        else:
+                            atten_sum += alphas.sum(axis=0)
+                            atten_max = np.max(np.concatenate([atten_max, alphas], axis=0), axis=0, keepdims=True)
+                            atten_n += alphas.shape[0]
+
+                    Pred_list.append(out_save)
+                    Target_list.append(y_save)
+                    time_list.append(self.sample['time'].numpy())
+
+                y = y.detach()
+                out = out.detach()
+                for k, madis_var in enumerate(self.madis_vars_o):
+                    out_k, y_k = self.GetPerVariableTargetAndPredictionFromMatrixForMonitoring(k, out, y)
+                    # (n_stations, 1)
+                    nb_obs[madis_var] += torch.numel(out_k)
+                    for per_variable_metrics_type in self.per_variable_metrics_types:
+                        per_variable_loss[madis_var][per_variable_metrics_type] += np.sum(self.per_variable_metrics[per_variable_metrics_type](out_k, y_k).cpu().numpy())
+
+        for madis_var in self.madis_vars_o:
+            for per_variable_metrics_type in self.per_variable_metrics_types:
+                per_variable_loss[madis_var][per_variable_metrics_type] /= nb_obs[madis_var]
+
+        loss_report /= n_report
+
+        if save == True:
+            self.Preds = np.concatenate(Pred_list, axis=0)
+            self.Targets = np.concatenate(Target_list, axis=0)
+            self.Times = np.concatenate(time_list, axis=0)
+
+            if atten_sum is not None:
+                self.Attns_Mean = atten_sum / atten_n
+                self.Attns_Max = atten_max.squeeze()
             else:
-                era5_lon = None
-                era5_lat = None
-                era5_x = None
-                edge_index_e2m = None
+                self.Attns_Mean = None
+                self.Attns_Max = None
 
-            if is_train:
-                optimizer.zero_grad()
+        self.save_metric_dict = save_metrics_dict
 
-            if model_type == ModelType.MLP:
-                b, s, t, v = madis_x.shape
-                madis_x = madis_x.view(b * s, t, v)
-                out = model(madis_x, b, era5_x)
-                _, v = out.shape
-                out = out.view(b, s, v)
-            elif model_type == ModelType.MPNN_MLP:
-                b, s, t, v = madis_x.shape
-                madis_x = madis_x.view(b * s, t * v)
-                bs, t, v = era5_x.shape
-                era5_x = era5_x.view(bs, t * v)
-                madis_pos = torch.cat((madis_lon, madis_lat), dim=-1).view(b * s, 2)
-                era5_pos = torch.cat((era5_lon, era5_lat), dim=-1).view(b * s, 2)
-                out = model(madis_x,
-                            madis_pos,
-                            era5_x,
-                            era5_pos)
-                _, v = out.shape
-                out = out.view(b, s, v)
-            else:
-                out = model(madis_x,
-                            madis_lon,
-                            madis_lat,
-                            edge_index_m2m,
-                            era5_lon,
-                            era5_lat,
-                            era5_x,
-                            edge_index_e2m)
+        return loss_report, per_variable_loss
 
-            y_u = madis_norm_dict['u'].decode(y_u)
-            y_v = madis_norm_dict['v'].decode(y_v)
-            y = torch.cat((y_u, y_v), dim=2)
+    def GetERA5Sample(self):
+        external_lon = self.sample[f'external_lon']
+        external_lat = self.sample[f'external_lat']
+        edge_index_ex2m = self.sample[f'ex2m_edge_index']
+        external_vals_dict = dict()
+        for external_var in self.external_vars:
+            external_vals_dict[external_var] = self.sample['ext_' + external_var.name]
+            external_vals_dict[external_var] = self.external_norm_dict[external_var].encode(
+                external_vals_dict[external_var]).unsqueeze(3)
+        external_x = torch.cat(list(external_vals_dict.values()), dim=-1)
+        return edge_index_ex2m, external_lat, external_lon, external_x
 
-            # denormalize output
-            out_u = madis_norm_dict['u'].decode(out[:, :, [0]])
-            out_v = madis_norm_dict['v'].decode(out[:, :, [1]])
-            out = torch.cat((out_u, out_v), dim=2)
-            # (n_batch, n_stations, 2)
+    def GetIsReal(self):
+        return np.concatenate(list(
+            map(lambda var: self.sample.get(var.name + '_is_real').unsqueeze(2) == 1,
+                self.madis_vars_o)), axis=-1)
 
-            if is_train:
-                ls = loss_function(out, y)
-                ls.backward()
-                optimizer.step()
+    def ProcessSampleMadis(self, sample):
+        madis_lon = sample[f'madis_lon'].to(self.device)
+        madis_lat = sample[f'madis_lat'].to(self.device)
+        edge_index_m2m = sample[f'k_edge_index'].to(self.device)
+        madis_vals_dict = dict()
+        for madis_var in self.madis_vars:
+            madis_vals_dict[madis_var] = sample[madis_var]
+            madis_vals_dict[madis_var] = self.madis_norm_dict[madis_var].encode(madis_vals_dict[madis_var]).unsqueeze(3)
+        y = self.GetTarget(madis_vals_dict).to(self.device)
+        madis_x = self.GetMadisInputs(madis_vals_dict).to(self.device)
+        return edge_index_m2m, madis_lat, madis_lon, madis_x, y
 
-            if save == True:
-                Pred_list.append(out.detach().cpu().numpy())
-                Target_list.append(y.detach().cpu().numpy())
+    def GetPredictionAndTargetForSaving(self, out, y):
+        out_save = out.detach().cpu().numpy()
+        y_save = y.detach().cpu().numpy()
+        return out_save, y_save
 
-            y_u = y_u.detach()
-            y_v = y_v.detach()
+    def GetPerVariableTargetAndPredictionFromMatrixForMonitoring(self, k, out, y):
+        out_k = out[..., k]
+        y_k = y[..., k]
+        return out_k, y_k
 
-            out_u = out_u.detach()
-            out_v = out_v.detach()
+    def GetMadisInputs(self, madis_vals_dict):
+        madis_x = torch.cat(list(map(madis_vals_dict.get, self.madis_vars_i)), dim=-1)
+        madis_matrix_len = madis_x.shape[2]
+        madis_x = madis_x[:, :, :madis_matrix_len - self.lead_hrs, :]
+        return madis_x
 
-            mse_u = torch.sum(F.mse_loss(out_u, y_u, reduction='none'), dim=0).cpu().numpy()
-            # (n_stations, 1)
-            mse_v = torch.sum(F.mse_loss(out_v, y_v, reduction='none'), dim=0).cpu().numpy()
-            # (n_stations, 1)
+    def GetTarget(self, madis_vals_dict):
+        y = torch.cat(list(map(lambda var: madis_vals_dict.get(var)[:, :, -1, :], self.madis_vars_o)), dim=-1)
+        return y
 
-            MSE_u_sum = MSE_u_sum + np.sum(mse_u)
-            MSE_v_sum = MSE_v_sum + np.sum(mse_v)
-
-            mae_u = torch.sum(F.l1_loss(out_u, y_u, reduction='none'), dim=0).cpu().numpy()
-            # (n_stations, 1)
-            mae_v = torch.sum(F.l1_loss(out_v, y_v, reduction='none'), dim=0).cpu().numpy()
-            # (n_stations, 1)
-
-            MAE_u_sum = MAE_u_sum + np.sum(mae_u)
-            MAE_v_sum = MAE_v_sum + np.sum(mae_v)
-
-    if save == True:
-        return MAE_u_sum, MSE_u_sum, MAE_v_sum, MSE_v_sum, np.concatenate(Pred_list, axis=0), np.concatenate(
-            Target_list, axis=0)
-
-    else:
-        return MAE_u_sum, MSE_u_sum, MAE_v_sum, MSE_v_sum
+    def RunModel(self, edge_index_ex2m, edge_index_m2m, external_lat, external_lon, external_x, madis_lat, madis_lon,
+                 madis_x):
+        alphas = None
+        if self.model_type == ModelType.ViT:
+            out, alphas = self.model(madis_x, external_x, return_attn=False)
+        elif self.model_type == ModelType.GNN:
+            out = self.model(madis_x,
+                             madis_lon,
+                             madis_lat,
+                             edge_index_m2m,
+                             external_lon,
+                             external_lat,
+                             external_x,
+                             edge_index_ex2m)
+        else:
+            raise NotImplementedError
+        return out, alphas

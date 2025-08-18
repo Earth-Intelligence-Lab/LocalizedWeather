@@ -51,16 +51,10 @@ class MPNN(nn.Module):
                                         nn.Linear(self.hidden_dim, self.n_out_features))
 
     def build_graph_internal(self, x, madis_lon, madis_lat, edge_index):
-        # madis_u: (n_batch, n_stations, n_times)
-        # madis_v: (n_batch, n_stations, n_times)
-        # madis_temp: (n_batch, n_stations, n_times)
-        # madis_lon: (n_batch, n_stations, 1)
-        # madis_lat: (n_batch, n_stations, 1)
 
         n_batch = x.size(0)
         n_stations = x.size(1)
 
-        # (n_batch, n_stations, n_times * 3)
         x = x.view(n_batch * n_stations, -1)
         # (n_batch * n_stations, n_times * 3)
 
@@ -84,8 +78,6 @@ class MPNN(nn.Module):
 
     def build_graph_external(self, madis_x, ex_x, ex_lon, ex_lat, edge_index):
         # madis_x: (n_batch, n_stations_m, n_features_m)
-        # madis_lon: (n_batch, n_stations_m, 1)
-        # madis_lat: (n_batch, n_stations_m, 1)
         # ex_x: (n_batch, n_stations_e, n_features_e)
         # ex_lon: (n_batch, n_stations_e, 1)
         # ex_lat: (n_batch, n_stations_e, 1)
@@ -119,7 +111,8 @@ class MPNN(nn.Module):
                 ex_lon,
                 ex_lat,
                 ex_x,
-                edge_index_e2m):
+                edge_index_e2m,
+                *args):
 
         # madis_x: (n_batch, n_stations_m, n_hours_m, n_features_m)
         # madis_lon: (n_batch, n_stations_m, 1)
@@ -137,27 +130,41 @@ class MPNN(nn.Module):
         edge_index_m2m = in_graph.edge_index
         # 2, n_batch * n_stations * n_neighbours
 
-        in_x = self.embedding_mlp(torch.cat((u, in_pos), dim=-1))
+        in_x = self.Forward_Embedding_MLP(in_pos, u, *args)
 
         if ex_x is not None:
+            b, n, t, v = ex_x.shape
+            ex_x = ex_x.view(b, n, -1)
             ex_graph = self.build_graph_external(madis_x, ex_x, ex_lon, ex_lat, edge_index_e2m)
             ex_x = ex_graph.x
             ex_pos = ex_graph.pos
             edge_index_e2m = ex_graph.edge_index
 
         if ex_x is not None:
-            in_x = self.gnn_ex_1(in_x, ex_x, in_pos, ex_pos, edge_index_e2m, batch)
+            in_x = self.Forward_External_Layer(self.gnn_ex_1, batch, edge_index_e2m, ex_pos, ex_x, in_pos, in_x, *args)
 
         for i in range(self.n_passing):
-            in_x = self.gnn_layers[i](in_x, u, in_pos, edge_index_m2m, batch)
+            in_x = self.Forward_Internal_Layer(batch, edge_index_m2m, i, in_pos, in_x, u, *args)
         # (n_batch * n_stations, hidden_dim)
 
         if ex_x is not None:
-            in_x = self.gnn_ex_2(in_x, ex_x, in_pos, ex_pos, edge_index_e2m, batch)
+            in_x = self.Forward_External_Layer(self.gnn_ex_2, batch, edge_index_e2m, ex_pos, ex_x, in_pos, in_x, *args)
 
-        out = self.output_mlp(in_x)
+        out = self.Forward_Output_MLP(in_x, *args)
         # (n_batch * n_stations, 2)
         out = out.view(n_batch, n_stations_m, self.n_out_features)
         # (n_batch, n_stations, 2)
 
         return out
+
+    def Forward_Output_MLP(self, in_x, *args):
+        return self.output_mlp(in_x)
+
+    def Forward_Embedding_MLP(self, in_pos, u, *args):
+        return self.embedding_mlp(torch.cat((u, in_pos), dim=-1))
+
+    def Forward_Internal_Layer(self, batch, edge_index_m2m, i, in_pos, in_x, u, *args):
+        return self.gnn_layers[i](in_x, u, in_pos, edge_index_m2m, batch)
+
+    def Forward_External_Layer(self, fun, batch, edge_index_e2m, ex_pos, ex_x, in_pos, in_x, *args):
+        return fun(in_x, ex_x, in_pos, ex_pos, edge_index_e2m, batch)

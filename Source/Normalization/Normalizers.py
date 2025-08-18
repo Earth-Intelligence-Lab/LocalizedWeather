@@ -1,6 +1,4 @@
-# This file contains utility functions for this project.
 # Author: Qidong Yang & Jonathan Giezendanner
-# Date: 2024-02-14
 
 
 class MinMaxNormalizer(object):
@@ -44,5 +42,27 @@ class ABNormalizer(object):
 
     def decode(self, x):
         x = (x - self.a) / self.delta + self.min
+
+        return x
+
+
+class StandardNormalizer(object):
+    def __init__(self, mean, std, eps=0.00001):
+        super(StandardNormalizer, self).__init__()
+
+        # normalization using overall maximum and minmum so falling into [0, 1]
+
+        self.mean = mean
+        self.std = std
+
+        self.eps = eps
+
+    def encode(self, x):
+        x = (x - self.mean) / (self.std + self.eps)
+
+        return x
+
+    def decode(self, x):
+        x = x * (self.std + self.eps) + self.mean
 
         return x
