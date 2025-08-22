@@ -6,7 +6,7 @@ The paper presents a novel multi-modal method that downscales gridded weather fo
 
 The model is evaluated on a surface wind prediction task and shows significant improvement over baseline methods, including ERA5 and HRRR interpolation and a multi-layer perceptron.
 
-Use the following citation when these data or model are used:
+Use the following citation when the data or the model are used:
 > Yang, Q.; Giezendanner, J.; Civitarese, D. S.; Jakubik, J.; 
 ,Schmitt E.; Chandra, A.; Vila, J.; Hohl, D.; Hill, C.; Watson, C.; Wang, S.; Local Off-Grid Weather Forecasting with Multi-Modal Earth Observation Data. arXiv, October 2024. https://doi.org/10.48550/arXiv.2410.12938
 
