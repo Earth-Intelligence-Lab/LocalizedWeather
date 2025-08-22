@@ -21,8 +21,8 @@ The following data is available:
 - Shapefile of the Northeastern United States (NE-US, extracted from [NWS](https://www.weather.gov/gis/USStates))
 - Shapefile containing the location and number of observations (2019-2023) of the MADIS stations in NE-US
 - Processed hourly averaged [MADIS](https://madis.ncep.noaa.gov/) data for the NE-US (2019-2023)
-- [ERA5](https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation) data for the NE-US (2019-2023), gridded and interpolated
-- HRRR tbd
+- [ERA5](https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation) re-analysis data for the NE-US (2019-2023), gridded and interpolated
+- [HRRR](https://rapidrefresh.noaa.gov/hrrr/) analysis and forecast data for the NE-US (2019-2023), gridded and interpolated
 
 For MADIS, ERA5 and HRRR, the following variables are available:
 - u and v component of wind vector at 10 meters above ground
@@ -46,33 +46,58 @@ The code expects the following data structure, you need to specify the root data
 ```
 RootDataPath/
 ├── ERA5
-│   ├── Interpolated
-│   │   ├── era5interpolated_e2m_8_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-│   │   ├── era5interpolated_e2m_8_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-│   │   ├── era5interpolated_e2m_8_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-│   │   ├── era5interpolated_e2m_8_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-│   │   └── era5interpolated_e2m_8_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-│   └── Processed
-│       ├── era5_2019_-83_-65_37_49.nc
-│       ├── era5_2020_-83_-65_37_49.nc
-│       ├── era5_2021_-83_-65_37_49.nc
-│       ├── era5_2022_-83_-65_37_49.nc
-│       └── era5_2023_-83_-65_37_49.nc
+│   ├── Interpolated
+│   │   ├── era5interpolated_e2m_1_Nearest_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   ├── era5interpolated_e2m_1_Nearest_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   ├── era5interpolated_e2m_1_Nearest_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   ├── era5interpolated_e2m_1_Nearest_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   │   └── era5interpolated_e2m_1_Nearest_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│   └── Processed
+│       ├── era5_2019_-83_-65_37_49.nc
+│       ├── era5_2019_e2m_1_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       ├── era5_2019_e2m_8_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       ├── era5_2020_-83_-65_37_49.nc
+│       ├── era5_2020_e2m_8_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       ├── era5_2021_-83_-65_37_49.nc
+│       ├── era5_2021_e2m_8_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       ├── era5_2022_-83_-65_37_49.nc
+│       ├── era5_2022_e2m_8_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       ├── era5_2023_-83_-65_37_49.nc
+│       └── era5_2023_e2m_8_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+├── HRRR
+│   └── Northeastern
+│       ├── Interpolated
+│       │   ├── HRRRinterpolated_h2m_1_Nearest_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       │   ├── HRRRinterpolated_h2m_1_Nearest_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       │   ├── HRRRinterpolated_h2m_1_Nearest_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       │   ├── HRRRinterpolated_h2m_1_Nearest_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       │   └── HRRRinterpolated_h2m_1_Nearest_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+│       └── Processed
+│           └── Yearly
+│               └── Madis
+│                   └── -80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9
+│                       ├── 2019.nc
+│                       ├── 2020.nc
+│                       ├── 2021.nc
+│                       ├── 2022.nc
+│                       └── 2023.nc
 ├── Shapefiles
-│   └── Regions
-│       ├── northeastern_buffered.cpg
-│       ├── northeastern_buffered.dbf
-│       ├── northeastern_buffered.prj
-│       ├── northeastern_buffered.shp
-│       └── northeastern_buffered.shx
+│   └── Regions
+│       ├── northeastern_buffered.cpg
+│       ├── northeastern_buffered.dbf
+│       ├── northeastern_buffered.geojson
+│       ├── northeastern_buffered.prj
+│       ├── northeastern_buffered.qmd
+│       ├── northeastern_buffered.shp
+│       └── northeastern_buffered.shx
 └── madis
     ├── processed
-    │   └── Meta--2019--2023
-    │       ├── madis_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-    │       ├── madis_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-    │       ├── madis_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-    │       ├── madis_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
-    │       └── madis_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │   └── Meta-2019-2023
+    │       ├── madis_2019_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       ├── madis_2020_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       ├── madis_2021_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       ├── madis_2022_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
+    │       └── madis_2023_-80.53_-66.94_38.92_47.47northeastern_buffered_filtered_0.9.nc
     └── stations
         ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.cpg
         ├── stations_2019_2023_-80.53_-66.94_38.92_47.47northeastern_buffered.dbf
