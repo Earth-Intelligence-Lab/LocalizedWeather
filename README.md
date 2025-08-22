@@ -42,7 +42,7 @@ The code is organised as follows (in `Source/`):
 - `Modules/Transformer/ViT.py` contains the code for the transformer and calls `Transformer/StationsEmbedding.py`.
 
 ### Code inputs
-The code expects the following data structure, you need to specify the root data path in the launcher (to be updated with HRRR data):
+The code expects the following data structure, you need to specify the root data path in the launcher:
 ```
 RootDataPath/
 ├── ERA5
