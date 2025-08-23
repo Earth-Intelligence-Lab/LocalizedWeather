@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/872621898.svg)](https://doi.org/10.5281/zenodo.16933936)
+
 # Localized Weather
 
 This repository contains the code and data for the paper ["Local Off-Grid Weather Forecasting with Multi-Modal Earth Observation Data"](https://arxiv.org/abs/2410.12938).
