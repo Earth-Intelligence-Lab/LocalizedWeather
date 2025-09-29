@@ -1,3 +1,4 @@
+[![arXiv](https://img.shields.io/badge/arXiv-2410.12938-b31b1b.svg)](https://arxiv.org/abs/2410.12938)
 [![DOI](https://zenodo.org/badge/872621898.svg)](https://doi.org/10.5281/zenodo.16933936)
 
 # Localized Weather
