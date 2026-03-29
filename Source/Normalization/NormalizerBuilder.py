@@ -26,8 +26,8 @@ def get_normalizers(Data_List, external_object, madis_vars, external_vars, scali
             madis_var_mins.append(Data.madis_mins_dict[madis_var])
             madis_var_maxs.append(Data.madis_maxs_dict[madis_var])
             madis_var_means.append(Data.madis_maxs_dict[madis_var])
-            madis_var_stds.append(Data.madis_maxs_dict[madis_var])
-            madis_var_ns.append(Data.madis_maxs_dict[madis_var])
+            madis_var_stds.append(Data.madis_stds_dict[madis_var])
+            madis_var_ns.append(Data.madis_ns_dict[madis_var])
 
         madis_var_min = np.min(np.array(madis_var_mins))
         madis_var_max = np.max(np.array(madis_var_maxs))
@@ -94,8 +94,8 @@ def get_normalizers(Data_List, external_object, madis_vars, external_vars, scali
                 external_var_mins.append(Data.external_mins_dict[external_var])
                 external_var_maxs.append(Data.external_maxs_dict[external_var])
                 external_var_means.append(Data.external_maxs_dict[external_var])
-                external_var_stds.append(Data.external_maxs_dict[external_var])
-                external_var_ns.append(Data.external_maxs_dict[external_var])
+                external_var_stds.append(Data.external_stds_dict[external_var])
+                external_var_ns.append(Data.external_ns_dict[external_var])
 
             external_var_min = np.min(np.array(external_var_mins))
             external_var_max = np.max(np.array(external_var_maxs))
